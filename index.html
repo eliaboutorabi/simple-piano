@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Simple Piano</title>
+    <link rel="stylesheet" href="styles.css?v=2" />
+  </head>
+  <body>
+    <main class="app" aria-label="Simple piano web app">
+      <section class="panel" aria-labelledby="app-title">
+        <div class="title-row">
+          <div>
+            <p class="eyebrow">Web Audio Piano</p>
+            <h1 id="app-title">Simple Piano</h1>
+          </div>
+          <button id="sustain" class="toggle" type="button" aria-pressed="false">
+            Sustain
+          </button>
+        </div>
+
+        <div class="controls" aria-label="Piano controls">
+          <label>
+            Volume
+            <input id="volume" type="range" min="0" max="1" step="0.01" value="0.55" />
+          </label>
+          <label>
+            Wave
+            <select id="waveform">
+              <option value="sine">Sine</option>
+              <option value="triangle" selected>Triangle</option>
+              <option value="square">Square</option>
+              <option value="sawtooth">Sawtooth</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="keyboard" role="group" aria-label="Piano keyboard">
+          <div class="white-keys" aria-hidden="false">
+            <button class="key white" data-note="C4" data-key="A">A</button>
+            <button class="key white" data-note="D4" data-key="S">S</button>
+            <button class="key white" data-note="E4" data-key="D">D</button>
+            <button class="key white" data-note="F4" data-key="F">F</button>
+            <button class="key white" data-note="G4" data-key="G">G</button>
+            <button class="key white" data-note="A4" data-key="H">H</button>
+            <button class="key white" data-note="B4" data-key="J">J</button>
+            <button class="key white" data-note="C5" data-key="K">K</button>
+          </div>
+          <div class="black-keys" aria-hidden="false">
+            <button class="key black" data-note="C#4" data-key="W">W</button>
+            <button class="key black" data-note="D#4" data-key="E">E</button>
+            <button class="key black" data-note="F#4" data-key="T">T</button>
+            <button class="key black" data-note="G#4" data-key="Y">Y</button>
+            <button class="key black" data-note="A#4" data-key="U">U</button>
+          </div>
+        </div>
+      </section>
+    </main>
+    <script src="app.js?v=2"></script>
+  </body>
+</html>
