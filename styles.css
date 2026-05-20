@@ -44,7 +44,8 @@ select {
 }
 
 .panel {
-  width: min(960px, 100%);
+  width: min(1120px, 100%);
+  min-width: 0;
   padding: 28px;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -152,15 +153,24 @@ select {
 }
 
 .keyboard {
-  position: relative;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   min-height: 310px;
   padding-top: 8px;
+  overflow-x: auto;
+  scrollbar-color: var(--line) transparent;
+}
+
+.key-bed {
+  position: relative;
+  min-width: 1020px;
 }
 
 .white-keys {
   display: grid;
-  grid-template-columns: repeat(8, minmax(52px, 1fr));
-  gap: 8px;
+  grid-template-columns: repeat(15, minmax(54px, 1fr));
+  gap: 6px;
 }
 
 .black-keys {
@@ -173,8 +183,10 @@ select {
 .key {
   position: relative;
   display: flex;
-  align-items: end;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
   min-width: 0;
   border: 1px solid var(--line);
   border-radius: 0 0 8px 8px;
@@ -189,7 +201,7 @@ select {
 
 .key.white {
   height: 300px;
-  padding-bottom: 24px;
+  padding: 0 8px 20px;
   background: var(--white-key);
   color: var(--muted);
   box-shadow: inset 0 -10px 0 rgba(21, 33, 29, 0.06);
@@ -199,9 +211,9 @@ select {
   position: absolute;
   top: 0;
   z-index: 2;
-  width: min(54px, 9vw);
+  width: 52px;
   height: 178px;
-  padding-bottom: 18px;
+  padding: 0 8px 16px;
   background: var(--black-key);
   color: white;
   border-color: #0c1210;
@@ -210,24 +222,16 @@ select {
   transform: translateX(-50%);
 }
 
-.key[data-note="C#4"] {
-  left: 12.5%;
+.note-name {
+  color: inherit;
+  font-size: 0.72rem;
+  font-weight: 750;
 }
 
-.key[data-note="D#4"] {
-  left: 25%;
-}
-
-.key[data-note="F#4"] {
-  left: 50%;
-}
-
-.key[data-note="G#4"] {
-  left: 62.5%;
-}
-
-.key[data-note="A#4"] {
-  left: 75%;
+.shortcut {
+  color: inherit;
+  font-size: 1rem;
+  font-weight: 850;
 }
 
 .key.active.white {
@@ -270,8 +274,12 @@ select {
     min-height: 230px;
   }
 
+  .key-bed {
+    min-width: 760px;
+  }
+
   .white-keys {
-    grid-template-columns: repeat(8, minmax(34px, 1fr));
+    grid-template-columns: repeat(15, minmax(40px, 1fr));
     gap: 5px;
   }
 
@@ -281,12 +289,20 @@ select {
 
   .key.white {
     height: 220px;
-    padding-bottom: 16px;
+    padding: 0 5px 14px;
   }
 
   .key.black {
-    width: min(32px, 8vw);
+    width: 36px;
     height: 132px;
-    padding-bottom: 12px;
+    padding: 0 4px 10px;
+  }
+
+  .note-name {
+    font-size: 0.62rem;
+  }
+
+  .shortcut {
+    font-size: 0.92rem;
   }
 }

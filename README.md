@@ -8,8 +8,10 @@ Open `index.html` in a browser, or serve the folder with any static file server.
 
 Keyboard mapping:
 
-- White keys: `A S D F G H J K`
-- Black keys: `W E T Y U`
+- White keys: `A S D F G H J K L ; '`
+- Black keys: `W E T Y U O P [ ] \`
+
+The highest keys can also be played by clicking or tapping the on-screen piano.
 
 ## Deploy
 
