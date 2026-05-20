@@ -12,18 +12,18 @@ const pianoKeys = [
   { note: "A#4", color: "black", shortcut: "u", position: 6 },
   { note: "B4", color: "white", shortcut: "j" },
   { note: "C5", color: "white", shortcut: "k" },
-  { note: "C#5", color: "black", shortcut: "o", position: 8 },
-  { note: "D5", color: "white", shortcut: "l" },
-  { note: "D#5", color: "black", shortcut: "p", position: 9 },
-  { note: "E5", color: "white", shortcut: ";" },
-  { note: "F5", color: "white", shortcut: "'" },
-  { note: "F#5", color: "black", shortcut: "[", position: 11 },
-  { note: "G5", color: "white" },
-  { note: "G#5", color: "black", shortcut: "]", position: 12 },
-  { note: "A5", color: "white" },
-  { note: "A#5", color: "black", shortcut: "\\", position: 13 },
-  { note: "B5", color: "white" },
-  { note: "C6", color: "white" },
+  { note: "C#5", color: "black", shortcut: "o", position: 8, mobileHidden: true },
+  { note: "D5", color: "white", shortcut: "l", mobileHidden: true },
+  { note: "D#5", color: "black", shortcut: "p", position: 9, mobileHidden: true },
+  { note: "E5", color: "white", shortcut: ";", mobileHidden: true },
+  { note: "F5", color: "white", shortcut: "'", mobileHidden: true },
+  { note: "F#5", color: "black", shortcut: "[", position: 11, mobileHidden: true },
+  { note: "G5", color: "white", mobileHidden: true },
+  { note: "G#5", color: "black", shortcut: "]", position: 12, mobileHidden: true },
+  { note: "A5", color: "white", mobileHidden: true },
+  { note: "A#5", color: "black", shortcut: "\\", position: 13, mobileHidden: true },
+  { note: "B5", color: "white", mobileHidden: true },
+  { note: "C6", color: "white", mobileHidden: true },
 ];
 
 const semitoneOffsets = {
@@ -132,13 +132,18 @@ function renderKeyboard() {
     key.dataset.note = pianoKey.note;
     key.setAttribute("aria-label", pianoKey.note);
 
+    if (pianoKey.mobileHidden) {
+      key.classList.add("mobile-hidden");
+    }
+
     if (pianoKey.shortcut) {
       key.dataset.key = pianoKey.shortcut;
       keysByKeyboard.set(pianoKey.shortcut.toLowerCase(), key);
     }
 
     if (pianoKey.position) {
-      key.style.left = `${(pianoKey.position / 15) * 100}%`;
+      key.style.setProperty("--key-left", `${(pianoKey.position / 15) * 100}%`);
+      key.style.setProperty("--mobile-key-left", `${(pianoKey.position / 8) * 100}%`);
     }
 
     key.innerHTML = `

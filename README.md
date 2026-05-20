@@ -12,6 +12,8 @@ Keyboard mapping:
 - Black keys: `W E T Y U O P [ ] \`
 
 The highest keys can also be played by clicking or tapping the on-screen piano.
+On phones, portrait mode shows a smaller keyboard; rotate the phone for the full
+keyboard.
 
 ## Deploy
 

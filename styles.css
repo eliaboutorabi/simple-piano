@@ -127,7 +127,7 @@ h1 {
   display: flex;
   flex-wrap: wrap;
   gap: 18px;
-  margin: 28px 0;
+  margin: 28px 0 10px;
 }
 
 .controls label {
@@ -150,6 +150,14 @@ select {
   border-radius: 8px;
   background: white;
   color: var(--ink);
+}
+
+.rotate-hint {
+  display: none;
+  margin: 0 0 18px;
+  color: var(--accent-strong);
+  font-size: 0.88rem;
+  font-weight: 700;
 }
 
 .keyboard {
@@ -210,6 +218,7 @@ select {
 .key.black {
   position: absolute;
   top: 0;
+  left: var(--key-left);
   z-index: 2;
   width: 52px;
   height: 178px;
@@ -304,5 +313,31 @@ select {
 
   .shortcut {
     font-size: 0.92rem;
+  }
+}
+
+@media (max-width: 680px) and (orientation: portrait) {
+  .rotate-hint {
+    display: block;
+  }
+
+  .keyboard {
+    overflow-x: visible;
+  }
+
+  .key-bed {
+    min-width: 0;
+  }
+
+  .white-keys {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+  }
+
+  .key.black {
+    left: var(--mobile-key-left);
+  }
+
+  .key.mobile-hidden {
+    display: none;
   }
 }
