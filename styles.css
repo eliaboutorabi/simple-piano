@@ -59,6 +59,39 @@ select {
   gap: 20px;
 }
 
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.icon-link {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--ink);
+  transition:
+    border-color 120ms ease,
+    color 120ms ease,
+    transform 120ms ease;
+}
+
+.icon-link:hover {
+  border-color: var(--accent);
+  color: var(--accent-strong);
+  transform: translateY(-1px);
+}
+
+.icon-link svg {
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
+}
+
 .eyebrow {
   margin: 0 0 6px;
   color: var(--accent);
@@ -207,6 +240,14 @@ select {
   transform: translateX(-50%) translateY(3px);
 }
 
+.credit {
+  margin-top: 22px;
+  color: var(--muted);
+  font-size: 0.92rem;
+  font-weight: 650;
+  text-align: center;
+}
+
 @media (max-width: 680px) {
   .app {
     padding: 16px;
@@ -219,6 +260,10 @@ select {
   .title-row {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .actions {
+    justify-content: space-between;
   }
 
   .keyboard {
