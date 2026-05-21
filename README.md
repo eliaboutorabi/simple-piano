@@ -2,6 +2,12 @@
 
 A small browser piano built with plain HTML, CSS, and JavaScript.
 
+Features:
+
+- Five sound presets: Classic Piano, Warm Pad, Bright Bell, Retro Synth, and Soft Organ
+- Adjustable delay and reverb effects
+- Volume and sustain controls
+
 ## Play locally
 
 Open `index.html` in a browser, or serve the folder with any static file server.

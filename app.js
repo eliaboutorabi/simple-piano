@@ -41,16 +41,76 @@ const semitoneOffsets = {
   B: 2,
 };
 
+const soundPresets = {
+  classic: {
+    attack: 0.015,
+    release: 0.28,
+    filter: 1800,
+    voices: [
+      { type: "triangle", gain: 0.8, detune: 0 },
+      { type: "sine", gain: 0.18, detune: 1200 },
+    ],
+  },
+  "warm-pad": {
+    attack: 0.18,
+    release: 1.1,
+    filter: 950,
+    voices: [
+      { type: "sine", gain: 0.45, detune: -7 },
+      { type: "triangle", gain: 0.45, detune: 7 },
+      { type: "sine", gain: 0.22, detune: 1200 },
+    ],
+  },
+  "bright-bell": {
+    attack: 0.006,
+    release: 0.9,
+    filter: 3200,
+    voices: [
+      { type: "sine", gain: 0.62, detune: 0 },
+      { type: "sine", gain: 0.28, detune: 1900 },
+      { type: "triangle", gain: 0.14, detune: 2400 },
+    ],
+  },
+  "retro-synth": {
+    attack: 0.02,
+    release: 0.45,
+    filter: 1400,
+    voices: [
+      { type: "sawtooth", gain: 0.42, detune: -8 },
+      { type: "sawtooth", gain: 0.42, detune: 8 },
+      { type: "square", gain: 0.16, detune: 0 },
+    ],
+  },
+  "soft-organ": {
+    attack: 0.03,
+    release: 0.35,
+    filter: 2200,
+    voices: [
+      { type: "sine", gain: 0.5, detune: 0 },
+      { type: "sine", gain: 0.28, detune: 1200 },
+      { type: "triangle", gain: 0.18, detune: 1900 },
+    ],
+  },
+};
+
 const activeNotes = new Map();
 const keysByNote = new Map();
 const keysByKeyboard = new Map();
 const volumeControl = document.querySelector("#volume");
-const waveformControl = document.querySelector("#waveform");
+const soundControl = document.querySelector("#sound");
+const delayControl = document.querySelector("#delay");
+const reverbControl = document.querySelector("#reverb");
 const sustainButton = document.querySelector("#sustain");
 const whiteKeys = document.querySelector(".white-keys");
 const blackKeys = document.querySelector(".black-keys");
 let audioContext;
+let dryGain;
+let delay;
+let delayFeedback;
+let delaySend;
 let masterGain;
+let reverb;
+let reverbSend;
 let sustain = false;
 
 renderKeyboard();
@@ -70,6 +130,9 @@ volumeControl.addEventListener("input", () => {
   }
 });
 
+delayControl.addEventListener("input", updateEffects);
+reverbControl.addEventListener("input", updateEffects);
+
 window.addEventListener("keydown", (event) => {
   if (event.repeat) return;
   const key = keysByKeyboard.get(event.key.toLowerCase());
@@ -84,9 +147,29 @@ window.addEventListener("keyup", (event) => {
 function getAudio() {
   if (!audioContext) {
     audioContext = new AudioContext();
+    dryGain = audioContext.createGain();
+    delay = audioContext.createDelay(1.2);
+    delayFeedback = audioContext.createGain();
+    delaySend = audioContext.createGain();
     masterGain = audioContext.createGain();
+    reverb = audioContext.createConvolver();
+    reverbSend = audioContext.createGain();
+
+    dryGain.gain.value = 0.86;
+    delay.delayTime.value = 0.24;
+    delayFeedback.gain.value = 0.28;
     masterGain.gain.value = Number(volumeControl.value);
+    reverb.buffer = createReverbBuffer(audioContext, 1.8, 2.2);
+
+    dryGain.connect(masterGain);
+    delaySend.connect(delay);
+    delay.connect(delayFeedback);
+    delayFeedback.connect(delay);
+    delay.connect(masterGain);
+    reverbSend.connect(reverb);
+    reverb.connect(masterGain);
     masterGain.connect(audioContext.destination);
+    updateEffects();
   }
 
   return audioContext;
@@ -96,19 +179,36 @@ function startNote(note) {
   if (activeNotes.has(note)) return;
 
   const context = getAudio();
-  const oscillator = context.createOscillator();
+  const preset = soundPresets[soundControl.value] ?? soundPresets.classic;
+  const filter = context.createBiquadFilter();
   const gain = context.createGain();
+  const oscillators = preset.voices.map((voice) => {
+    const oscillator = context.createOscillator();
+    const voiceGain = context.createGain();
 
-  oscillator.type = waveformControl.value;
-  oscillator.frequency.value = getFrequency(note);
+    oscillator.type = voice.type;
+    oscillator.frequency.value = getFrequency(note);
+    oscillator.detune.value = voice.detune ?? 0;
+    voiceGain.gain.value = voice.gain;
+    oscillator.connect(voiceGain);
+    voiceGain.connect(filter);
+
+    return oscillator;
+  });
+
+  filter.type = "lowpass";
+  filter.frequency.value = preset.filter;
+  filter.Q.value = 0.7;
   gain.gain.setValueAtTime(0.0001, context.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.8, context.currentTime + 0.015);
+  gain.gain.exponentialRampToValueAtTime(0.8, context.currentTime + preset.attack);
 
-  oscillator.connect(gain);
-  gain.connect(masterGain);
-  oscillator.start();
+  filter.connect(gain);
+  gain.connect(dryGain);
+  gain.connect(delaySend);
+  gain.connect(reverbSend);
+  oscillators.forEach((oscillator) => oscillator.start());
 
-  activeNotes.set(note, { oscillator, gain });
+  activeNotes.set(note, { oscillators, gain, release: preset.release });
   keysByNote.get(note)?.classList.add("active");
 }
 
@@ -119,7 +219,7 @@ function stopNote(note, force = false) {
   const context = getAudio();
   active.gain.gain.cancelScheduledValues(context.currentTime);
   active.gain.gain.setTargetAtTime(0.0001, context.currentTime, 0.08);
-  active.oscillator.stop(context.currentTime + 0.28);
+  active.oscillators.forEach((oscillator) => oscillator.stop(context.currentTime + active.release));
   activeNotes.delete(note);
   keysByNote.get(note)?.classList.remove("active");
 }
@@ -169,4 +269,28 @@ function getFrequency(note) {
   const [, pitch, octave] = note.match(/^([A-G]#?)(\d)$/);
   const semitonesFromA4 = semitoneOffsets[pitch] + (Number(octave) - 4) * 12;
   return 440 * 2 ** (semitonesFromA4 / 12);
+}
+
+function updateEffects() {
+  if (!audioContext) return;
+
+  const delayAmount = Number(delayControl.value);
+  const reverbAmount = Number(reverbControl.value);
+  delaySend.gain.setTargetAtTime(delayAmount, audioContext.currentTime, 0.02);
+  reverbSend.gain.setTargetAtTime(reverbAmount, audioContext.currentTime, 0.02);
+}
+
+function createReverbBuffer(context, duration, decay) {
+  const sampleRate = context.sampleRate;
+  const length = sampleRate * duration;
+  const impulse = context.createBuffer(2, length, sampleRate);
+
+  for (let channel = 0; channel < impulse.numberOfChannels; channel += 1) {
+    const data = impulse.getChannelData(channel);
+    for (let index = 0; index < length; index += 1) {
+      data[index] = (Math.random() * 2 - 1) * (1 - index / length) ** decay;
+    }
+  }
+
+  return impulse;
 }
