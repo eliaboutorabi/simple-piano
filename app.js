@@ -113,17 +113,15 @@ let masterGain;
 let reverb;
 let reverbSend;
 let sustain = false;
+let sustainLatched = false;
+let spaceSustainHeld = false;
 
 renderKeyboard();
 syncThemeToggle();
 
 sustainButton.addEventListener("click", () => {
-  sustain = !sustain;
-  sustainButton.setAttribute("aria-pressed", String(sustain));
-
-  if (!sustain) {
-    activeNotes.forEach((_, note) => stopNote(note, true));
-  }
+  sustainLatched = !sustainLatched;
+  syncSustain();
 });
 
 volumeControl.addEventListener("input", () => {
@@ -143,12 +141,28 @@ themeToggle.addEventListener("click", () => {
 });
 
 window.addEventListener("keydown", (event) => {
+  if (event.code === "Space") {
+    event.preventDefault();
+    if (!event.repeat) {
+      spaceSustainHeld = true;
+      syncSustain();
+    }
+    return;
+  }
+
   if (event.repeat) return;
   const key = keysByKeyboard.get(event.key.toLowerCase());
   if (key) startNote(key.dataset.note);
 });
 
 window.addEventListener("keyup", (event) => {
+  if (event.code === "Space") {
+    event.preventDefault();
+    spaceSustainHeld = false;
+    syncSustain();
+    return;
+  }
+
   const key = keysByKeyboard.get(event.key.toLowerCase());
   if (key) stopNote(key.dataset.note);
 });
@@ -287,6 +301,18 @@ function updateEffects() {
   const reverbAmount = Number(reverbControl.value);
   delaySend.gain.setTargetAtTime(delayAmount, audioContext.currentTime, 0.02);
   reverbSend.gain.setTargetAtTime(reverbAmount, audioContext.currentTime, 0.02);
+}
+
+function syncSustain() {
+  const nextSustain = sustainLatched || spaceSustainHeld;
+  if (sustain === nextSustain) return;
+
+  sustain = nextSustain;
+  sustainButton.setAttribute("aria-pressed", String(sustain));
+
+  if (!sustain) {
+    activeNotes.forEach((_, note) => stopNote(note, true));
+  }
 }
 
 function createReverbBuffer(context, duration, decay) {
