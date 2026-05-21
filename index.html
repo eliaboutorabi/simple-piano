@@ -40,7 +40,7 @@
         : "light";
       document.documentElement.dataset.theme = savedTheme || preferredTheme;
     </script>
-    <link rel="stylesheet" href="styles.css?v=8" />
+    <link rel="stylesheet" href="styles.css?v=10" />
   </head>
   <body>
     <main class="app" aria-label="Simple piano web app">
@@ -90,6 +90,10 @@
           </div>
         </div>
 
+        <div class="visualizer" aria-label="Audio waveform visualizer">
+          <canvas id="waveform" width="960" height="160"></canvas>
+        </div>
+
         <div class="controls" aria-label="Piano controls">
           <label>
             Volume
@@ -125,6 +129,6 @@
         <footer class="credit">Built by Elham Aboutorabi</footer>
       </section>
     </main>
-    <script src="app.js?v=9"></script>
+    <script src="app.js?v=10"></script>
   </body>
 </html>

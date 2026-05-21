@@ -102,9 +102,12 @@ const delayControl = document.querySelector("#delay");
 const reverbControl = document.querySelector("#reverb");
 const sustainButton = document.querySelector("#sustain");
 const themeToggle = document.querySelector("#theme-toggle");
+const waveformCanvas = document.querySelector("#waveform");
+const waveformContext = waveformCanvas.getContext("2d");
 const whiteKeys = document.querySelector(".white-keys");
 const blackKeys = document.querySelector(".black-keys");
 let audioContext;
+let analyser;
 let dryGain;
 let delay;
 let delayFeedback;
@@ -115,9 +118,15 @@ let reverbSend;
 let sustain = false;
 let sustainLatched = false;
 let spaceSustainHeld = false;
+let waveformData;
+let smoothedWaveform;
+let visualizerFrame;
+let visualEnergy = 0;
 
 renderKeyboard();
 syncThemeToggle();
+resizeWaveform();
+drawWaveform();
 
 sustainButton.addEventListener("click", () => {
   sustainLatched = !sustainLatched;
@@ -177,7 +186,9 @@ function getAudio() {
     masterGain = audioContext.createGain();
     reverb = audioContext.createConvolver();
     reverbSend = audioContext.createGain();
-
+    analyser = audioContext.createAnalyser();
+    analyser.fftSize = 2048;
+    waveformData = new Uint8Array(analyser.fftSize);
     dryGain.gain.value = 0.86;
     delay.delayTime.value = 0.24;
     delayFeedback.gain.value = 0.28;
@@ -191,12 +202,16 @@ function getAudio() {
     delay.connect(masterGain);
     reverbSend.connect(reverb);
     reverb.connect(masterGain);
+    masterGain.connect(analyser);
     masterGain.connect(audioContext.destination);
     updateEffects();
+    startVisualizer();
   }
 
   return audioContext;
 }
+
+window.addEventListener("resize", resizeWaveform);
 
 function startNote(note) {
   if (activeNotes.has(note)) return;
@@ -313,6 +328,141 @@ function syncSustain() {
   if (!sustain) {
     activeNotes.forEach((_, note) => stopNote(note, true));
   }
+}
+
+function resizeWaveform() {
+  const ratio = window.devicePixelRatio || 1;
+  const { width, height } = waveformCanvas.getBoundingClientRect();
+  waveformCanvas.width = Math.max(1, Math.floor(width * ratio));
+  waveformCanvas.height = Math.max(1, Math.floor(height * ratio));
+  waveformContext.setTransform(ratio, 0, 0, ratio, 0, 0);
+}
+
+function startVisualizer() {
+  if (!visualizerFrame) {
+    visualizerFrame = requestAnimationFrame(drawWaveform);
+  }
+}
+
+function drawWaveform() {
+  visualizerFrame = requestAnimationFrame(drawWaveform);
+
+  const { width, height } = waveformCanvas.getBoundingClientRect();
+  const styles = getComputedStyle(document.documentElement);
+  const accent = styles.getPropertyValue("--accent").trim();
+  const strong = styles.getPropertyValue("--accent-strong").trim();
+  const muted = styles.getPropertyValue("--line-strong").trim();
+  waveformContext.clearRect(0, 0, width, height);
+  waveformContext.lineCap = "round";
+  waveformContext.lineJoin = "round";
+
+  const centerY = height / 2;
+  const sampleCount = 180;
+  const now = performance.now() * 0.002;
+  const wave = getStableWaveform(sampleCount);
+  const hasSignal = visualEnergy > 0.015;
+  const amplitude = hasSignal ? 0.42 : 0.035;
+
+  waveformContext.beginPath();
+  for (let index = 0; index < sampleCount; index += 1) {
+    const progress = index / (sampleCount - 1);
+    const x = progress * width;
+    const edgeFade = Math.sin(Math.PI * progress);
+    const idle = Math.sin(progress * Math.PI * 4 + now) * 0.18;
+    const signal = hasSignal ? wave[index] : idle;
+    const y = centerY + signal * height * amplitude * edgeFade;
+
+    if (index === 0) {
+      waveformContext.moveTo(x, y);
+    } else {
+      waveformContext.lineTo(x, y);
+    }
+  }
+
+  waveformContext.shadowColor = accent;
+  waveformContext.shadowBlur = hasSignal ? 18 : 8;
+  waveformContext.strokeStyle = muted;
+  waveformContext.globalAlpha = hasSignal ? 0.24 : 0.16;
+  waveformContext.lineWidth = hasSignal ? 8 : 5;
+  waveformContext.stroke();
+  waveformContext.globalAlpha = 1;
+
+  waveformContext.beginPath();
+  for (let index = 0; index < sampleCount; index += 1) {
+    const progress = index / (sampleCount - 1);
+    const x = progress * width;
+    const edgeFade = Math.sin(Math.PI * progress);
+    const idle = Math.sin(progress * Math.PI * 4 + now) * 0.18;
+    const signal = hasSignal ? wave[index] : idle;
+    const y = centerY + signal * height * amplitude * edgeFade;
+
+    if (index === 0) {
+      waveformContext.moveTo(x, y);
+    } else {
+      waveformContext.lineTo(x, y);
+    }
+  }
+
+  waveformContext.strokeStyle = accent;
+  waveformContext.lineWidth = hasSignal ? 3 : 2;
+  waveformContext.stroke();
+  waveformContext.shadowBlur = 0;
+
+  waveformContext.beginPath();
+  waveformContext.moveTo(0, centerY);
+  waveformContext.lineTo(width, centerY);
+  waveformContext.strokeStyle = hasSignal ? strong : muted;
+  waveformContext.globalAlpha = hasSignal ? 0.24 : 0.16;
+  waveformContext.lineWidth = 1;
+  waveformContext.stroke();
+  waveformContext.globalAlpha = 1;
+}
+
+function getStableWaveform(sampleCount) {
+  if (!smoothedWaveform || smoothedWaveform.length !== sampleCount) {
+    smoothedWaveform = new Float32Array(sampleCount);
+  }
+
+  if (!analyser || !waveformData) {
+    visualEnergy *= 0.92;
+    return smoothedWaveform;
+  }
+
+  analyser.getByteTimeDomainData(waveformData);
+
+  let energy = 0;
+  for (let index = 0; index < waveformData.length; index += 1) {
+    const sample = (waveformData[index] - 128) / 128;
+    energy += sample * sample;
+  }
+
+  energy = Math.sqrt(energy / waveformData.length);
+  visualEnergy += (energy - visualEnergy) * 0.16;
+
+  const start = findRisingZeroCrossing(waveformData);
+  const windowSize = Math.min(880, waveformData.length - start - 1);
+  const step = windowSize / sampleCount;
+
+  for (let index = 0; index < sampleCount; index += 1) {
+    const dataIndex = Math.min(waveformData.length - 1, Math.floor(start + index * step));
+    const target = (waveformData[dataIndex] - 128) / 128;
+    smoothedWaveform[index] += (target - smoothedWaveform[index]) * 0.24;
+  }
+
+  return smoothedWaveform;
+}
+
+function findRisingZeroCrossing(data) {
+  const midpoint = 128;
+  const limit = Math.floor(data.length * 0.7);
+
+  for (let index = 1; index < limit; index += 1) {
+    if (data[index - 1] < midpoint && data[index] >= midpoint) {
+      return Math.max(0, index - 8);
+    }
+  }
+
+  return 0;
 }
 
 function createReverbBuffer(context, duration, decay) {

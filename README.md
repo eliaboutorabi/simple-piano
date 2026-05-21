@@ -14,6 +14,7 @@ Play it here: [eliaboutorabi.github.io/simple-piano](https://eliaboutorabi.githu
 - Adjustable delay and reverb effects for atmospheric sounds
 - Volume and sustain controls
 - Light and dark mode with saved theme preference
+- Live waveform visualizer powered by the Web Audio output
 - Keyboard, mouse, and touch support
 - Responsive phone layout with a landscape hint for the full keyboard
 
