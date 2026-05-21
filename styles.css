@@ -22,6 +22,27 @@
   --shadow: 0 28px 80px rgba(21, 33, 29, 0.14);
 }
 
+[data-theme="dark"] {
+  color-scheme: dark;
+  --ink: #eef7f3;
+  --muted: #aab9b3;
+  --line: #2f4540;
+  --line-strong: #49645d;
+  --paper: #101715;
+  --panel: #18211f;
+  --panel-soft: #1d2926;
+  --accent: #58c7b8;
+  --accent-strong: #8fe3d6;
+  --accent-soft: #173b35;
+  --honey: #e1b45b;
+  --rose: #d5897e;
+  --black-key: #080d0c;
+  --black-key-active: #173b35;
+  --white-key: #eef4f1;
+  --white-key-active: #9bd9cf;
+  --shadow: 0 30px 90px rgba(0, 0, 0, 0.34);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -32,7 +53,7 @@ body {
   background:
     linear-gradient(135deg, rgba(15, 118, 110, 0.12), transparent 34%),
     linear-gradient(225deg, rgba(197, 107, 93, 0.16), transparent 36%),
-    linear-gradient(180deg, #ffffff 0%, rgba(255, 255, 255, 0) 42%),
+    linear-gradient(180deg, var(--panel) 0%, rgba(255, 255, 255, 0) 42%),
     var(--paper);
   color: var(--ink);
   text-rendering: optimizeLegibility;
@@ -58,7 +79,7 @@ select {
   border: 1px solid var(--line);
   border-radius: 8px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.9)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.06)),
     var(--panel);
   box-shadow: var(--shadow);
 }
@@ -83,7 +104,7 @@ select {
   place-items: center;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.74);
+  background: color-mix(in srgb, var(--panel) 82%, white 18%);
   color: var(--ink);
   box-shadow: 0 10px 26px rgba(21, 33, 29, 0.06);
   transition:
@@ -104,6 +125,22 @@ select {
   width: 22px;
   height: 22px;
   fill: currentColor;
+}
+
+.theme-toggle {
+  border: 1px solid var(--line);
+}
+
+.theme-toggle .sun-icon {
+  display: none;
+}
+
+[data-theme="dark"] .theme-toggle .sun-icon {
+  display: block;
+}
+
+[data-theme="dark"] .theme-toggle .moon-icon {
+  display: none;
 }
 
 .eyebrow {
@@ -134,7 +171,7 @@ h1 {
   padding: 0 20px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.74);
+  background: color-mix(in srgb, var(--panel) 82%, white 18%);
   color: var(--ink);
   cursor: pointer;
   font-weight: 750;
@@ -164,8 +201,8 @@ h1 {
   gap: 20px;
   margin: 34px 0 12px;
   padding: 22px 0 18px;
-  border-top: 1px solid rgba(213, 223, 218, 0.8);
-  border-bottom: 1px solid rgba(213, 223, 218, 0.8);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
 }
 
 .controls label {
@@ -193,7 +230,7 @@ input[type="range"]::-webkit-slider-runnable-track {
   border-radius: 999px;
   background:
     linear-gradient(90deg, rgba(15, 118, 110, 0.22), rgba(213, 155, 45, 0.2)),
-    #edf3f0;
+    var(--panel-soft);
   box-shadow: inset 0 1px 2px rgba(21, 33, 29, 0.08);
 }
 
@@ -214,7 +251,7 @@ input[type="range"]::-moz-range-track {
   height: 8px;
   border: 1px solid var(--line-strong);
   border-radius: 999px;
-  background: #edf3f0;
+  background: var(--panel-soft);
 }
 
 input[type="range"]::-moz-range-thumb {
@@ -240,6 +277,18 @@ select {
   color: var(--ink);
   font-weight: 760;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+[data-theme="dark"] select {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] input[type="range"]::-webkit-slider-thumb {
+  border-color: #13201d;
+}
+
+[data-theme="dark"] input[type="range"]::-moz-range-thumb {
+  border-color: #13201d;
 }
 
 .rotate-hint {
@@ -287,7 +336,7 @@ select {
   justify-content: flex-end;
   gap: 8px;
   min-width: 0;
-  border: 1px solid #dfe7e3;
+  border: 1px solid var(--line);
   border-radius: 0 0 8px 8px;
   cursor: pointer;
   font-weight: 800;
@@ -308,6 +357,13 @@ select {
     0 6px 16px rgba(21, 33, 29, 0.04);
 }
 
+[data-theme="dark"] .key.white {
+  color: #53615c;
+  box-shadow:
+    inset 0 -10px 0 rgba(21, 33, 29, 0.12),
+    0 8px 22px rgba(0, 0, 0, 0.18);
+}
+
 .key.black {
   position: absolute;
   top: 0;
@@ -318,10 +374,14 @@ select {
   padding: 0 8px 16px;
   background: var(--black-key);
   color: white;
-  border-color: #0c1210;
+  border-color: #050807;
   box-shadow: 0 14px 22px rgba(21, 33, 29, 0.24);
   pointer-events: auto;
   transform: translateX(-50%);
+}
+
+[data-theme="dark"] .key.black {
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.38);
 }
 
 .note-name {

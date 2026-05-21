@@ -101,6 +101,7 @@ const soundControl = document.querySelector("#sound");
 const delayControl = document.querySelector("#delay");
 const reverbControl = document.querySelector("#reverb");
 const sustainButton = document.querySelector("#sustain");
+const themeToggle = document.querySelector("#theme-toggle");
 const whiteKeys = document.querySelector(".white-keys");
 const blackKeys = document.querySelector(".black-keys");
 let audioContext;
@@ -114,6 +115,7 @@ let reverbSend;
 let sustain = false;
 
 renderKeyboard();
+syncThemeToggle();
 
 sustainButton.addEventListener("click", () => {
   sustain = !sustain;
@@ -132,6 +134,13 @@ volumeControl.addEventListener("input", () => {
 
 delayControl.addEventListener("input", updateEffects);
 reverbControl.addEventListener("input", updateEffects);
+
+themeToggle.addEventListener("click", () => {
+  const nextTheme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+  document.documentElement.dataset.theme = nextTheme;
+  localStorage.setItem("simple-piano-theme", nextTheme);
+  syncThemeToggle();
+});
 
 window.addEventListener("keydown", (event) => {
   if (event.repeat) return;
@@ -293,4 +302,10 @@ function createReverbBuffer(context, duration, decay) {
   }
 
   return impulse;
+}
+
+function syncThemeToggle() {
+  const isDark = document.documentElement.dataset.theme === "dark";
+  themeToggle.setAttribute("aria-label", isDark ? "Switch to light mode" : "Switch to dark mode");
+  themeToggle.setAttribute("aria-pressed", String(isDark));
 }
