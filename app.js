@@ -98,6 +98,10 @@ const keysByNote = new Map();
 const keysByKeyboard = new Map();
 const volumeControl = document.querySelector("#volume");
 const soundControl = document.querySelector("#sound");
+const soundButton = document.querySelector("#sound-button");
+const soundLabel = document.querySelector("#sound-label");
+const presetShell = document.querySelector(".preset-shell");
+const soundOptions = document.querySelectorAll("[data-sound]");
 const delayControl = document.querySelector("#delay");
 const reverbControl = document.querySelector("#reverb");
 const octaveControl = document.querySelector("#octave");
@@ -166,6 +170,69 @@ octaveButtons.forEach((button) => {
   });
 });
 
+soundButton.addEventListener("click", () => {
+  toggleSoundMenu();
+});
+
+soundButton.addEventListener("keydown", (event) => {
+  if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+    event.preventDefault();
+    openSoundMenu();
+    focusSoundOption(soundControl.value);
+  }
+});
+
+soundOptions.forEach((option) => {
+  option.addEventListener("click", () => {
+    setSoundPreset(option.dataset.sound);
+    closeSoundMenu();
+    soundButton.focus();
+  });
+
+  option.addEventListener("keydown", (event) => {
+    const currentIndex = [...soundOptions].indexOf(option);
+
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      soundOptions[(currentIndex + 1) % soundOptions.length].focus();
+    }
+
+    if (event.key === "ArrowUp") {
+      event.preventDefault();
+      soundOptions[(currentIndex - 1 + soundOptions.length) % soundOptions.length].focus();
+    }
+
+    if (event.key === "Home") {
+      event.preventDefault();
+      soundOptions[0].focus();
+    }
+
+    if (event.key === "End") {
+      event.preventDefault();
+      soundOptions[soundOptions.length - 1].focus();
+    }
+
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      setSoundPreset(option.dataset.sound);
+      closeSoundMenu();
+      soundButton.focus();
+    }
+
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closeSoundMenu();
+      soundButton.focus();
+    }
+  });
+});
+
+document.addEventListener("click", (event) => {
+  if (!presetShell.contains(event.target)) {
+    closeSoundMenu();
+  }
+});
+
 themeToggle.addEventListener("click", () => {
   const nextTheme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
   document.documentElement.dataset.theme = nextTheme;
@@ -174,6 +241,8 @@ themeToggle.addEventListener("click", () => {
 });
 
 window.addEventListener("keydown", (event) => {
+  if (event.target.closest(".preset-shell")) return;
+
   if (event.code === "Space") {
     event.preventDefault();
     if (!event.repeat) {
@@ -412,6 +481,40 @@ function getControlProgress(control) {
   const max = Number(control.max);
   const value = Number(control.value);
   return (value - min) / (max - min);
+}
+
+function setSoundPreset(nextSound) {
+  const selectedOption = [...soundOptions].find((option) => option.dataset.sound === nextSound);
+  if (!selectedOption) return;
+
+  soundControl.value = nextSound;
+  soundLabel.textContent = selectedOption.textContent;
+  soundOptions.forEach((option) => {
+    option.setAttribute("aria-selected", String(option === selectedOption));
+  });
+}
+
+function toggleSoundMenu() {
+  if (presetShell.dataset.open === "true") {
+    closeSoundMenu();
+  } else {
+    openSoundMenu();
+  }
+}
+
+function openSoundMenu() {
+  presetShell.dataset.open = "true";
+  soundButton.setAttribute("aria-expanded", "true");
+}
+
+function closeSoundMenu() {
+  presetShell.dataset.open = "false";
+  soundButton.setAttribute("aria-expanded", "false");
+}
+
+function focusSoundOption(sound) {
+  const selectedOption = [...soundOptions].find((option) => option.dataset.sound === sound);
+  selectedOption?.focus();
 }
 
 function syncSustain() {

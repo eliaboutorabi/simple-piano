@@ -40,7 +40,7 @@
         : "light";
       document.documentElement.dataset.theme = savedTheme || preferredTheme;
     </script>
-    <link rel="stylesheet" href="styles.css?v=25" />
+    <link rel="stylesheet" href="styles.css?v=26" />
   </head>
   <body>
     <main class="app" aria-label="Simple piano web app">
@@ -112,7 +112,7 @@
             </span>
             <output id="volume-value" for="volume">55%</output>
           </label>
-          <label class="preset-control">
+          <div class="preset-control control-block">
             <span class="control-heading">
               <span class="control-title">
                 <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
@@ -124,15 +124,26 @@
               </span>
             </span>
             <span class="preset-shell">
-              <select id="sound">
-                <option value="classic" selected>Classic Piano</option>
-                <option value="warm-pad">Warm Pad</option>
-                <option value="bright-bell">Bright Bell</option>
-                <option value="retro-synth">Retro Synth</option>
-                <option value="soft-organ">Soft Organ</option>
-              </select>
+              <input id="sound" type="hidden" value="classic" />
+              <button
+                id="sound-button"
+                class="preset-button"
+                type="button"
+                aria-haspopup="listbox"
+                aria-expanded="false"
+                aria-controls="sound-menu"
+              >
+                <span id="sound-label">Classic Piano</span>
+              </button>
+              <span id="sound-menu" class="preset-menu" role="listbox" aria-label="Sound preset">
+                <button type="button" role="option" data-sound="classic" aria-selected="true">Classic Piano</button>
+                <button type="button" role="option" data-sound="warm-pad" aria-selected="false">Warm Pad</button>
+                <button type="button" role="option" data-sound="bright-bell" aria-selected="false">Bright Bell</button>
+                <button type="button" role="option" data-sound="retro-synth" aria-selected="false">Retro Synth</button>
+                <button type="button" role="option" data-sound="soft-organ" aria-selected="false">Soft Organ</button>
+              </span>
             </span>
-          </label>
+          </div>
           <label class="effect-control">
             <span class="control-heading">
               <span class="control-title">
@@ -216,6 +227,6 @@
         <footer class="credit">Built by Elham Aboutorabi</footer>
       </section>
     </main>
-    <script src="app.js?v=25"></script>
+    <script src="app.js?v=26"></script>
   </body>
 </html>
