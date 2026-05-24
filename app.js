@@ -403,7 +403,7 @@ function drawWaveform() {
   waveformContext.lineJoin = "round";
 
   const centerY = height / 2;
-  const sampleCount = 220;
+  const sampleCount = 520;
   const now = performance.now() * 0.002;
   const wave = getStableWaveform(sampleCount);
   const hasSignal = visualEnergy > 0.015;
