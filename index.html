@@ -96,11 +96,29 @@
 
         <div class="controls" aria-label="Piano controls">
           <label>
-            Volume
+            <span class="control-heading">
+              <span class="control-title">
+                <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+                  <path d="M11 5 6 9H2v6h4l5 4V5Z" />
+                  <path d="M15.5 8.5a5 5 0 0 1 0 7" />
+                  <path d="M18.5 5.5a9 9 0 0 1 0 13" />
+                </svg>
+                Volume
+              </span>
+            </span>
             <input id="volume" type="range" min="0" max="1" step="0.01" value="0.55" />
           </label>
           <label>
-            Sound
+            <span class="control-heading">
+              <span class="control-title">
+                <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+                  <path d="M9 18V5l12-2v13" />
+                  <circle cx="6" cy="18" r="3" />
+                  <circle cx="18" cy="16" r="3" />
+                </svg>
+                Sound
+              </span>
+            </span>
             <select id="sound">
               <option value="classic" selected>Classic Piano</option>
               <option value="warm-pad">Warm Pad</option>
@@ -110,16 +128,43 @@
             </select>
           </label>
           <label>
-            Delay
+            <span class="control-heading">
+              <span class="control-title">
+                <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+                  <circle cx="12" cy="12" r="9" />
+                  <path d="M12 7v5l3 2" />
+                </svg>
+                Delay
+              </span>
+            </span>
             <input id="delay" type="range" min="0" max="0.8" step="0.01" value="0.12" />
           </label>
           <label>
-            Reverb
+            <span class="control-heading">
+              <span class="control-title">
+                <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+                  <path d="M2 12h2" />
+                  <path d="M6 8v8" />
+                  <path d="M10 5v14" />
+                  <path d="M14 8v8" />
+                  <path d="M18 10v4" />
+                  <path d="M22 12h-2" />
+                </svg>
+                Reverb
+              </span>
+            </span>
             <input id="reverb" type="range" min="0" max="0.8" step="0.01" value="0.18" />
           </label>
           <label class="octave-control">
             <span class="control-heading">
-              Octave
+              <span class="control-title">
+                <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+                  <path d="m6 8 6-6 6 6" />
+                  <path d="m18 16-6 6-6-6" />
+                  <path d="M12 2v20" />
+                </svg>
+                Octave
+              </span>
               <output id="octave-value" for="octave">Base</output>
             </span>
             <input id="octave" type="range" min="-2" max="2" step="1" value="0" />
@@ -136,6 +181,6 @@
         <footer class="credit">Built by Elham Aboutorabi</footer>
       </section>
     </main>
-    <script src="app.js?v=19"></script>
+    <script src="app.js?v=20"></script>
   </body>
 </html>
