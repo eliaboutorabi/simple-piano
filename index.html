@@ -40,7 +40,7 @@
         : "light";
       document.documentElement.dataset.theme = savedTheme || preferredTheme;
     </script>
-    <link rel="stylesheet" href="styles.css?v=10" />
+    <link rel="stylesheet" href="styles.css?v=12" />
   </head>
   <body>
     <main class="app" aria-label="Simple piano web app">
@@ -117,6 +117,13 @@
             Reverb
             <input id="reverb" type="range" min="0" max="0.8" step="0.01" value="0.18" />
           </label>
+          <label class="octave-control">
+            <span class="control-heading">
+              Octave
+              <output id="octave-value" for="octave">Base</output>
+            </span>
+            <input id="octave" type="range" min="-2" max="2" step="1" value="0" />
+          </label>
         </div>
         <p class="rotate-hint">Rotate your phone for the full keyboard.</p>
 
@@ -129,6 +136,6 @@
         <footer class="credit">Built by Elham Aboutorabi</footer>
       </section>
     </main>
-    <script src="app.js?v=11"></script>
+    <script src="app.js?v=12"></script>
   </body>
 </html>

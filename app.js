@@ -100,6 +100,8 @@ const volumeControl = document.querySelector("#volume");
 const soundControl = document.querySelector("#sound");
 const delayControl = document.querySelector("#delay");
 const reverbControl = document.querySelector("#reverb");
+const octaveControl = document.querySelector("#octave");
+const octaveValue = document.querySelector("#octave-value");
 const sustainButton = document.querySelector("#sustain");
 const themeToggle = document.querySelector("#theme-toggle");
 const waveformCanvas = document.querySelector("#waveform");
@@ -118,12 +120,14 @@ let reverbSend;
 let sustain = false;
 let sustainLatched = false;
 let spaceSustainHeld = false;
+let octaveShift = 0;
 let waveformData;
 let smoothedWaveform;
 let visualizerFrame;
 let visualEnergy = 0;
 
 renderKeyboard();
+syncOctave();
 syncThemeToggle();
 resizeWaveform();
 drawWaveform();
@@ -141,6 +145,9 @@ volumeControl.addEventListener("input", () => {
 
 delayControl.addEventListener("input", updateEffects);
 reverbControl.addEventListener("input", updateEffects);
+octaveControl.addEventListener("input", () => {
+  setOctaveShift(Number(octaveControl.value));
+});
 
 themeToggle.addEventListener("click", () => {
   const nextTheme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
@@ -156,6 +163,18 @@ window.addEventListener("keydown", (event) => {
       spaceSustainHeld = true;
       syncSustain();
     }
+    return;
+  }
+
+  if (event.code === "Equal" || event.code === "NumpadAdd") {
+    event.preventDefault();
+    if (!event.repeat) setOctaveShift(octaveShift + 1);
+    return;
+  }
+
+  if (event.code === "Minus" || event.code === "NumpadSubtract") {
+    event.preventDefault();
+    if (!event.repeat) setOctaveShift(octaveShift - 1);
     return;
   }
 
@@ -250,6 +269,16 @@ function startNote(note) {
   keysByNote.get(note)?.classList.add("active");
 }
 
+function setOctaveShift(nextShift) {
+  const clampedShift = Math.max(Number(octaveControl.min), Math.min(Number(octaveControl.max), nextShift));
+  if (octaveShift === clampedShift) return;
+
+  activeNotes.forEach((_, note) => stopNote(note, true));
+  octaveShift = clampedShift;
+  octaveControl.value = String(octaveShift);
+  syncOctave();
+}
+
 function stopNote(note, force = false) {
   const active = activeNotes.get(note);
   if (!active || (sustain && !force)) return;
@@ -267,8 +296,7 @@ function renderKeyboard() {
     const key = document.createElement("button");
     key.className = `key ${pianoKey.color}`;
     key.type = "button";
-    key.dataset.note = pianoKey.note;
-    key.setAttribute("aria-label", pianoKey.note);
+    key.dataset.baseNote = pianoKey.note;
 
     if (pianoKey.mobileHidden) {
       key.classList.add("mobile-hidden");
@@ -285,7 +313,7 @@ function renderKeyboard() {
     }
 
     key.innerHTML = `
-      <span class="note-name">${pianoKey.note}</span>
+      <span class="note-name"></span>
       ${pianoKey.shortcut ? `<span class="shortcut">${pianoKey.shortcut.toUpperCase()}</span>` : ""}
     `;
 
@@ -301,6 +329,24 @@ function renderKeyboard() {
       blackKeys.append(key);
     }
   });
+}
+
+function syncOctave() {
+  octaveValue.textContent = octaveShift === 0 ? "Base" : `${octaveShift > 0 ? "+" : ""}${octaveShift}`;
+
+  keysByNote.clear();
+  document.querySelectorAll(".key").forEach((key) => {
+    const note = shiftNote(key.dataset.baseNote, octaveShift);
+    key.dataset.note = note;
+    key.setAttribute("aria-label", note);
+    key.querySelector(".note-name").textContent = note;
+    keysByNote.set(note, key);
+  });
+}
+
+function shiftNote(note, shift) {
+  const [, pitch, octave] = note.match(/^([A-G]#?)(\d)$/);
+  return `${pitch}${Number(octave) + shift}`;
 }
 
 function getFrequency(note) {
