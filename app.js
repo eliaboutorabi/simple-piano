@@ -407,7 +407,7 @@ function drawWaveform() {
   const now = performance.now() * 0.002;
   const wave = getStableWaveform(sampleCount);
   const hasSignal = visualEnergy > 0.015;
-  const amplitude = hasSignal ? 0.56 : 0.035;
+  const amplitude = hasSignal ? 0.5 : 0.035;
 
   waveformContext.beginPath();
   for (let index = 0; index < sampleCount; index += 1) {
@@ -492,7 +492,7 @@ function getStableWaveform(sampleCount) {
   for (let index = 0; index < sampleCount; index += 1) {
     const dataIndex = Math.min(waveformData.length - 1, Math.floor(start + index * step));
     const rawSample = (waveformData[dataIndex] - 128) / 128;
-    const target = Math.max(-1, Math.min(1, rawSample * 3.2));
+    const target = Math.max(-0.92, Math.min(0.92, rawSample * 3));
     smoothedWaveform[index] += (target - smoothedWaveform[index]) * 0.24;
   }
 
