@@ -125,6 +125,7 @@ let waveformData;
 let smoothedWaveform;
 let visualizerFrame;
 let visualEnergy = 0;
+let waveformGain = 1;
 
 renderKeyboard();
 syncOctave();
@@ -488,11 +489,21 @@ function getStableWaveform(sampleCount) {
   const start = findRisingZeroCrossing(waveformData);
   const windowSize = Math.min(1320, waveformData.length - start - 1);
   const step = windowSize / sampleCount;
+  let peak = 0;
 
   for (let index = 0; index < sampleCount; index += 1) {
     const dataIndex = Math.min(waveformData.length - 1, Math.floor(start + index * step));
     const rawSample = (waveformData[dataIndex] - 128) / 128;
-    const target = Math.max(-0.92, Math.min(0.92, rawSample * 3));
+    peak = Math.max(peak, Math.abs(rawSample));
+  }
+
+  const targetGain = peak > 0.001 ? Math.min(10, 0.86 / peak) : 1;
+  waveformGain += (targetGain - waveformGain) * 0.14;
+
+  for (let index = 0; index < sampleCount; index += 1) {
+    const dataIndex = Math.min(waveformData.length - 1, Math.floor(start + index * step));
+    const rawSample = (waveformData[dataIndex] - 128) / 128;
+    const target = rawSample * waveformGain;
     smoothedWaveform[index] += (target - smoothedWaveform[index]) * 0.24;
   }
 
