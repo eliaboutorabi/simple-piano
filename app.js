@@ -317,9 +317,9 @@ function renderKeyboard() {
       ${pianoKey.shortcut ? `<span class="shortcut">${pianoKey.shortcut.toUpperCase()}</span>` : ""}
     `;
 
-    key.addEventListener("pointerdown", () => startNote(pianoKey.note));
-    key.addEventListener("pointerup", () => stopNote(pianoKey.note));
-    key.addEventListener("pointerleave", () => stopNote(pianoKey.note));
+    key.addEventListener("pointerdown", () => startNote(key.dataset.note));
+    key.addEventListener("pointerup", () => stopNote(key.dataset.note));
+    key.addEventListener("pointerleave", () => stopNote(key.dataset.note));
 
     keysByNote.set(pianoKey.note, key);
 
