@@ -240,18 +240,22 @@ h1 {
 .controls {
   display: grid;
   grid-template-columns:
-    minmax(120px, 0.8fr)
-    minmax(190px, 1.1fr)
-    repeat(3, minmax(120px, 0.8fr));
-  gap: 20px;
-  margin: 20px 0 10px;
-  padding: 20px 0 16px;
+    minmax(150px, 0.9fr)
+    minmax(210px, 1.15fr)
+    repeat(2, minmax(120px, 0.72fr))
+    minmax(170px, 0.95fr);
+  column-gap: 22px;
+  row-gap: 16px;
+  align-items: start;
+  margin: 18px 0 10px;
+  padding: 18px 0 18px;
   border-bottom: 1px solid var(--line);
 }
 
 .controls label {
   display: grid;
-  gap: 10px;
+  grid-template-rows: 24px 82px;
+  gap: 8px;
   min-width: 0;
   color: var(--muted);
   font-size: 0.78rem;
@@ -264,6 +268,8 @@ h1 {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
+  min-height: 24px;
+  line-height: 1;
 }
 
 .control-title {
@@ -312,14 +318,14 @@ h1 {
 .fader-shell {
   position: relative;
   display: grid;
-  min-height: 50px;
+  height: 82px;
   align-items: center;
 }
 
 .fader-shell::before {
   content: "";
   position: absolute;
-  inset: 14px 0 auto;
+  inset: 30px 0 auto;
   height: 19px;
   border: 1px solid var(--line);
   border-radius: 999px;
@@ -334,7 +340,7 @@ h1 {
 
 .fader-ticks {
   position: absolute;
-  inset: auto 8px 0;
+  inset: auto 8px 14px;
   height: 8px;
   background: repeating-linear-gradient(
     90deg,
@@ -349,7 +355,7 @@ h1 {
   position: relative;
   z-index: 1;
   width: 100%;
-  height: 34px;
+  height: 82px;
   margin: 0;
   appearance: none;
   background: transparent;
@@ -396,34 +402,38 @@ h1 {
 
 .preset-shell {
   position: relative;
-  display: block;
+  display: grid;
+  height: 82px;
+  align-items: center;
 }
 
 .preset-shell::before {
   content: "";
   position: absolute;
-  inset: 7px auto 7px 10px;
-  width: 4px;
-  border-radius: 999px;
-  background: var(--accent);
-  box-shadow: 0 0 16px var(--wave-glow);
+  inset: auto 14px auto auto;
+  width: 9px;
+  height: 9px;
+  border-right: 2px solid var(--accent-strong);
+  border-bottom: 2px solid var(--accent-strong);
+  transform: translateY(-2px) rotate(45deg);
   pointer-events: none;
 }
 
 select {
-  min-height: 46px;
+  min-height: 56px;
   width: 100%;
   appearance: none;
-  padding: 0 42px 0 22px;
-  border: 1px solid var(--line);
+  padding: 0 42px 0 16px;
+  border: 1px solid color-mix(in srgb, var(--line) 84%, var(--accent) 16%);
   border-radius: 8px;
   background:
-    linear-gradient(45deg, transparent 50%, var(--accent-strong) 50%) right 17px center / 7px 7px no-repeat,
-    linear-gradient(135deg, var(--accent-strong) 50%, transparent 50%) right 12px center / 7px 7px no-repeat,
-    var(--panel-soft);
+    linear-gradient(180deg, color-mix(in srgb, var(--panel-soft) 94%, white 6%), color-mix(in srgb, var(--panel-soft) 86%, var(--ink) 6%));
   color: var(--ink);
   font-weight: 760;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.64),
+    inset 0 -10px 20px rgba(21, 33, 29, 0.04),
+    0 10px 24px rgba(21, 33, 29, 0.05);
 }
 
 .effect-control {
@@ -439,6 +449,7 @@ select {
   height: 78px;
   place-self: center;
   place-items: center;
+  margin-top: 2px;
 }
 
 .knob-input {
@@ -525,7 +536,8 @@ select:focus-visible {
 .octave-steps {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  min-height: 42px;
+  align-self: center;
+  min-height: 56px;
   padding: 3px;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -559,7 +571,10 @@ select:focus-visible {
 }
 
 [data-theme="dark"] select {
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -10px 20px rgba(0, 0, 0, 0.14),
+    0 10px 24px rgba(0, 0, 0, 0.16);
 }
 
 [data-theme="dark"] .fader-control input[type="range"]::-webkit-slider-thumb {
