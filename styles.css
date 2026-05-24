@@ -266,15 +266,17 @@ h1 {
 .control-heading {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   gap: 10px;
   min-height: 24px;
   line-height: 1;
+  text-align: center;
 }
 
 .control-title {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 7px;
   min-width: 0;
 }
