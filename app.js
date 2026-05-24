@@ -403,11 +403,11 @@ function drawWaveform() {
   waveformContext.lineJoin = "round";
 
   const centerY = height / 2;
-  const sampleCount = 180;
+  const sampleCount = 220;
   const now = performance.now() * 0.002;
   const wave = getStableWaveform(sampleCount);
   const hasSignal = visualEnergy > 0.015;
-  const amplitude = hasSignal ? 0.42 : 0.035;
+  const amplitude = hasSignal ? 0.56 : 0.035;
 
   waveformContext.beginPath();
   for (let index = 0; index < sampleCount; index += 1) {
@@ -486,12 +486,13 @@ function getStableWaveform(sampleCount) {
   visualEnergy += (energy - visualEnergy) * 0.16;
 
   const start = findRisingZeroCrossing(waveformData);
-  const windowSize = Math.min(880, waveformData.length - start - 1);
+  const windowSize = Math.min(1320, waveformData.length - start - 1);
   const step = windowSize / sampleCount;
 
   for (let index = 0; index < sampleCount; index += 1) {
     const dataIndex = Math.min(waveformData.length - 1, Math.floor(start + index * step));
-    const target = (waveformData[dataIndex] - 128) / 128;
+    const rawSample = (waveformData[dataIndex] - 128) / 128;
+    const target = Math.max(-1, Math.min(1, rawSample * 3.2));
     smoothedWaveform[index] += (target - smoothedWaveform[index]) * 0.24;
   }
 
