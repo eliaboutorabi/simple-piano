@@ -407,7 +407,7 @@ function drawWaveform() {
   const now = performance.now() * 0.002;
   const wave = getStableWaveform(sampleCount);
   const hasSignal = visualEnergy > 0.015;
-  const amplitude = hasSignal ? 0.5 : 0.035;
+  const amplitude = hasSignal ? 0.38 : 0.035;
 
   waveformContext.beginPath();
   for (let index = 0; index < sampleCount; index += 1) {
@@ -502,7 +502,7 @@ function getStableWaveform(sampleCount) {
 
 function getDisplayGain() {
   const volume = Number(volumeControl.value);
-  return Math.min(8, Math.max(1.25, 2.6 / Math.max(0.24, volume)));
+  return Math.min(4.2, Math.max(1, 1.15 / Math.max(0.28, volume)));
 }
 
 function findRisingZeroCrossing(data) {
