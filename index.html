@@ -40,7 +40,7 @@
         : "light";
       document.documentElement.dataset.theme = savedTheme || preferredTheme;
     </script>
-    <link rel="stylesheet" href="styles.css?v=22" />
+    <link rel="stylesheet" href="styles.css?v=23" />
   </head>
   <body>
     <main class="app" aria-label="Simple piano web app">
@@ -105,12 +105,12 @@
                 </svg>
                 Volume
               </span>
-              <output id="volume-value" for="volume">55%</output>
             </span>
             <span class="fader-shell">
               <input id="volume" type="range" min="0" max="1" step="0.01" value="0.55" />
               <span class="fader-ticks" aria-hidden="true"></span>
             </span>
+            <output id="volume-value" for="volume">55%</output>
           </label>
           <label class="preset-control">
             <span class="control-heading">
@@ -142,7 +142,6 @@
                 </svg>
                 Delay
               </span>
-              <output id="delay-value" for="delay">15%</output>
             </span>
             <span class="knob-control" data-knob="delay">
               <input id="delay" class="knob-input" type="range" min="0" max="0.8" step="0.01" value="0.12" />
@@ -150,6 +149,7 @@
                 <span class="knob-dial"></span>
               </span>
             </span>
+            <output id="delay-value" for="delay">15%</output>
           </label>
           <label class="effect-control">
             <span class="control-heading">
@@ -164,7 +164,6 @@
                 </svg>
                 Reverb
               </span>
-              <output id="reverb-value" for="reverb">23%</output>
             </span>
             <span class="knob-control" data-knob="reverb">
               <input id="reverb" class="knob-input" type="range" min="0" max="0.8" step="0.01" value="0.18" />
@@ -172,6 +171,7 @@
                 <span class="knob-dial"></span>
               </span>
             </span>
+            <output id="reverb-value" for="reverb">23%</output>
           </label>
           <label class="octave-control">
             <span class="control-heading">
@@ -183,7 +183,6 @@
                 </svg>
                 Octave
               </span>
-              <output id="octave-value" for="octave">Base</output>
             </span>
             <input
               id="octave"
@@ -203,6 +202,7 @@
               <button type="button" data-octave="1">+1</button>
               <button type="button" data-octave="2">+2</button>
             </span>
+            <output id="octave-value" for="octave">Base</output>
           </label>
         </div>
         <p class="rotate-hint">Rotate your phone for the full keyboard.</p>
@@ -216,6 +216,6 @@
         <footer class="credit">Built by Elham Aboutorabi</footer>
       </section>
     </main>
-    <script src="app.js?v=22"></script>
+    <script src="app.js?v=23"></script>
   </body>
 </html>

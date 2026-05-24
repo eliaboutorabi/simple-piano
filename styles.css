@@ -254,8 +254,8 @@ h1 {
 
 .controls label {
   display: grid;
-  grid-template-rows: 24px 82px;
-  gap: 8px;
+  grid-template-rows: 24px 72px 18px;
+  gap: 7px;
   min-width: 0;
   color: var(--muted);
   font-size: 0.78rem;
@@ -266,7 +266,7 @@ h1 {
 .control-heading {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 10px;
   min-height: 24px;
   line-height: 1;
@@ -293,11 +293,11 @@ h1 {
 
 #octave-value {
   min-width: 44px;
-  padding: 3px 8px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
   color: var(--accent-strong);
-  background: color-mix(in srgb, var(--panel-soft) 76%, var(--accent-soft) 24%);
+  background: transparent;
   font-size: 0.72rem;
   font-weight: 850;
   text-align: center;
@@ -311,21 +311,21 @@ h1 {
   color: var(--accent-strong);
   font-size: 0.72rem;
   font-weight: 850;
-  text-align: right;
+  text-align: center;
   text-transform: none;
 }
 
 .fader-shell {
   position: relative;
   display: grid;
-  height: 82px;
+  height: 72px;
   align-items: center;
 }
 
 .fader-shell::before {
   content: "";
   position: absolute;
-  inset: 30px 0 auto;
+  inset: 26px 0 auto;
   height: 19px;
   border: 1px solid var(--line);
   border-radius: 999px;
@@ -340,7 +340,7 @@ h1 {
 
 .fader-ticks {
   position: absolute;
-  inset: auto 8px 14px;
+  inset: auto 8px 8px;
   height: 8px;
   background: repeating-linear-gradient(
     90deg,
@@ -355,7 +355,7 @@ h1 {
   position: relative;
   z-index: 1;
   width: 100%;
-  height: 82px;
+  height: 72px;
   margin: 0;
   appearance: none;
   background: transparent;
@@ -403,8 +403,9 @@ h1 {
 .preset-shell {
   position: relative;
   display: grid;
-  height: 82px;
+  height: 72px;
   align-items: center;
+  grid-row: 2 / 4;
 }
 
 .preset-shell::before {
@@ -445,11 +446,10 @@ select {
   --knob-fill: 15%;
   position: relative;
   display: grid;
-  width: 78px;
-  height: 78px;
+  width: 72px;
+  height: 72px;
   place-self: center;
   place-items: center;
-  margin-top: 2px;
 }
 
 .knob-input {
@@ -475,8 +475,8 @@ select:focus-visible {
 
 .knob-shell {
   position: relative;
-  width: 74px;
-  height: 74px;
+  width: 70px;
+  height: 70px;
   border: 1px solid var(--line);
   border-radius: 50%;
   background:
@@ -501,7 +501,7 @@ select:focus-visible {
 
 .knob-dial {
   position: absolute;
-  inset: 14px;
+  inset: 13px;
   border: 1px solid color-mix(in srgb, var(--line-strong) 80%, var(--ink) 20%);
   border-radius: 50%;
   background:
@@ -537,7 +537,7 @@ select:focus-visible {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   align-self: center;
-  min-height: 56px;
+  min-height: 54px;
   padding: 3px;
   border: 1px solid var(--line);
   border-radius: 8px;
