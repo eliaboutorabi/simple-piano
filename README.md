@@ -24,7 +24,7 @@ Open `index.html` in a browser, or serve the folder with any static file server.
 
 Keyboard mapping:
 
-- White keys: `A S D F G H J K L ; '`
+- White keys: `A S D F G H J K L ; ' N M , .`
 - Black keys: `W E T Y U O P [ ] \`
 - Sustain pedal: hold `Space`
 

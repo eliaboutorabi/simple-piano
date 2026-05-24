@@ -18,12 +18,12 @@ const pianoKeys = [
   { note: "E5", color: "white", shortcut: ";", mobileHidden: true },
   { note: "F5", color: "white", shortcut: "'", mobileHidden: true },
   { note: "F#5", color: "black", shortcut: "[", position: 11, mobileHidden: true },
-  { note: "G5", color: "white", mobileHidden: true },
+  { note: "G5", color: "white", shortcut: "n", mobileHidden: true },
   { note: "G#5", color: "black", shortcut: "]", position: 12, mobileHidden: true },
-  { note: "A5", color: "white", mobileHidden: true },
+  { note: "A5", color: "white", shortcut: "m", mobileHidden: true },
   { note: "A#5", color: "black", shortcut: "\\", position: 13, mobileHidden: true },
-  { note: "B5", color: "white", mobileHidden: true },
-  { note: "C6", color: "white", mobileHidden: true },
+  { note: "B5", color: "white", shortcut: ",", mobileHidden: true },
+  { note: "C6", color: "white", shortcut: ".", mobileHidden: true },
 ];
 
 const semitoneOffsets = {
