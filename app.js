@@ -101,7 +101,11 @@ const soundControl = document.querySelector("#sound");
 const delayControl = document.querySelector("#delay");
 const reverbControl = document.querySelector("#reverb");
 const octaveControl = document.querySelector("#octave");
+const volumeValue = document.querySelector("#volume-value");
+const delayValue = document.querySelector("#delay-value");
+const reverbValue = document.querySelector("#reverb-value");
 const octaveValue = document.querySelector("#octave-value");
+const octaveButtons = document.querySelectorAll("[data-octave]");
 const sustainButton = document.querySelector("#sustain");
 const themeToggle = document.querySelector("#theme-toggle");
 const waveformCanvas = document.querySelector("#waveform");
@@ -128,6 +132,7 @@ let visualEnergy = 0;
 
 renderKeyboard();
 syncOctave();
+syncControlDisplays();
 syncThemeToggle();
 resizeWaveform();
 drawWaveform();
@@ -138,15 +143,27 @@ sustainButton.addEventListener("click", () => {
 });
 
 volumeControl.addEventListener("input", () => {
+  updateFaderDisplay(volumeControl, volumeValue);
   if (masterGain) {
     masterGain.gain.setTargetAtTime(Number(volumeControl.value), audioContext.currentTime, 0.01);
   }
 });
 
-delayControl.addEventListener("input", updateEffects);
-reverbControl.addEventListener("input", updateEffects);
+delayControl.addEventListener("input", () => {
+  updateKnobDisplay(delayControl, delayValue);
+  updateEffects();
+});
+reverbControl.addEventListener("input", () => {
+  updateKnobDisplay(reverbControl, reverbValue);
+  updateEffects();
+});
 octaveControl.addEventListener("input", () => {
   setOctaveShift(Number(octaveControl.value));
+});
+octaveButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    setOctaveShift(Number(button.dataset.octave));
+  });
 });
 
 themeToggle.addEventListener("click", () => {
@@ -333,6 +350,10 @@ function renderKeyboard() {
 
 function syncOctave() {
   octaveValue.textContent = octaveShift === 0 ? "Base" : `${octaveShift > 0 ? "+" : ""}${octaveShift}`;
+  octaveButtons.forEach((button) => {
+    const isActive = Number(button.dataset.octave) === octaveShift;
+    button.setAttribute("aria-pressed", String(isActive));
+  });
 
   keysByNote.clear();
   document.querySelectorAll(".key").forEach((key) => {
@@ -362,6 +383,35 @@ function updateEffects() {
   const reverbAmount = Number(reverbControl.value);
   delaySend.gain.setTargetAtTime(delayAmount, audioContext.currentTime, 0.02);
   reverbSend.gain.setTargetAtTime(reverbAmount, audioContext.currentTime, 0.02);
+}
+
+function syncControlDisplays() {
+  updateFaderDisplay(volumeControl, volumeValue);
+  updateKnobDisplay(delayControl, delayValue);
+  updateKnobDisplay(reverbControl, reverbValue);
+}
+
+function updateFaderDisplay(control, output) {
+  const progress = getControlProgress(control);
+  control.parentElement.style.setProperty("--fill", `${progress * 100}%`);
+  output.textContent = `${Math.round(progress * 100)}%`;
+}
+
+function updateKnobDisplay(control, output) {
+  const progress = getControlProgress(control);
+  const rotation = -135 + progress * 270;
+  const knob = control.closest(".knob-control");
+
+  knob.style.setProperty("--rotation", `${rotation}deg`);
+  knob.style.setProperty("--knob-fill", `${progress * 75}%`);
+  output.textContent = `${Math.round(progress * 100)}%`;
+}
+
+function getControlProgress(control) {
+  const min = Number(control.min);
+  const max = Number(control.max);
+  const value = Number(control.value);
+  return (value - min) / (max - min);
 }
 
 function syncSustain() {

@@ -40,7 +40,7 @@
         : "light";
       document.documentElement.dataset.theme = savedTheme || preferredTheme;
     </script>
-    <link rel="stylesheet" href="styles.css?v=20" />
+    <link rel="stylesheet" href="styles.css?v=21" />
   </head>
   <body>
     <main class="app" aria-label="Simple piano web app">
@@ -95,7 +95,7 @@
         </div>
 
         <div class="controls" aria-label="Piano controls">
-          <label>
+          <label class="fader-control">
             <span class="control-heading">
               <span class="control-title">
                 <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
@@ -105,10 +105,14 @@
                 </svg>
                 Volume
               </span>
+              <output id="volume-value" for="volume">55%</output>
             </span>
-            <input id="volume" type="range" min="0" max="1" step="0.01" value="0.55" />
+            <span class="fader-shell">
+              <input id="volume" type="range" min="0" max="1" step="0.01" value="0.55" />
+              <span class="fader-ticks" aria-hidden="true"></span>
+            </span>
           </label>
-          <label>
+          <label class="preset-control">
             <span class="control-heading">
               <span class="control-title">
                 <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
@@ -119,15 +123,17 @@
                 Sound
               </span>
             </span>
-            <select id="sound">
-              <option value="classic" selected>Classic Piano</option>
-              <option value="warm-pad">Warm Pad</option>
-              <option value="bright-bell">Bright Bell</option>
-              <option value="retro-synth">Retro Synth</option>
-              <option value="soft-organ">Soft Organ</option>
-            </select>
+            <span class="preset-shell">
+              <select id="sound">
+                <option value="classic" selected>Classic Piano</option>
+                <option value="warm-pad">Warm Pad</option>
+                <option value="bright-bell">Bright Bell</option>
+                <option value="retro-synth">Retro Synth</option>
+                <option value="soft-organ">Soft Organ</option>
+              </select>
+            </span>
           </label>
-          <label>
+          <label class="effect-control">
             <span class="control-heading">
               <span class="control-title">
                 <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
@@ -136,10 +142,16 @@
                 </svg>
                 Delay
               </span>
+              <output id="delay-value" for="delay">15%</output>
             </span>
-            <input id="delay" type="range" min="0" max="0.8" step="0.01" value="0.12" />
+            <span class="knob-control" data-knob="delay">
+              <input id="delay" class="knob-input" type="range" min="0" max="0.8" step="0.01" value="0.12" />
+              <span class="knob-shell" aria-hidden="true">
+                <span class="knob-dial"></span>
+              </span>
+            </span>
           </label>
-          <label>
+          <label class="effect-control">
             <span class="control-heading">
               <span class="control-title">
                 <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
@@ -152,8 +164,14 @@
                 </svg>
                 Reverb
               </span>
+              <output id="reverb-value" for="reverb">23%</output>
             </span>
-            <input id="reverb" type="range" min="0" max="0.8" step="0.01" value="0.18" />
+            <span class="knob-control" data-knob="reverb">
+              <input id="reverb" class="knob-input" type="range" min="0" max="0.8" step="0.01" value="0.18" />
+              <span class="knob-shell" aria-hidden="true">
+                <span class="knob-dial"></span>
+              </span>
+            </span>
           </label>
           <label class="octave-control">
             <span class="control-heading">
@@ -167,7 +185,24 @@
               </span>
               <output id="octave-value" for="octave">Base</output>
             </span>
-            <input id="octave" type="range" min="-2" max="2" step="1" value="0" />
+            <input
+              id="octave"
+              class="sr-only-range"
+              type="range"
+              min="-2"
+              max="2"
+              step="1"
+              value="0"
+              tabindex="-1"
+              aria-hidden="true"
+            />
+            <span class="octave-steps" role="group" aria-label="Octave shift">
+              <button type="button" data-octave="-2">-2</button>
+              <button type="button" data-octave="-1">-1</button>
+              <button type="button" data-octave="0">Base</button>
+              <button type="button" data-octave="1">+1</button>
+              <button type="button" data-octave="2">+2</button>
+            </span>
           </label>
         </div>
         <p class="rotate-hint">Rotate your phone for the full keyboard.</p>
@@ -181,6 +216,6 @@
         <footer class="credit">Built by Elham Aboutorabi</footer>
       </section>
     </main>
-    <script src="app.js?v=20"></script>
+    <script src="app.js?v=21"></script>
   </body>
 </html>
