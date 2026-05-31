@@ -94,6 +94,7 @@ const soundPresets = {
 };
 
 const activeNotes = new Map();
+const heldArpNotes = new Set();
 const keysByNote = new Map();
 const keysByKeyboard = new Map();
 const volumeControl = document.querySelector("#volume");
@@ -102,6 +103,14 @@ const soundButton = document.querySelector("#sound-button");
 const soundLabel = document.querySelector("#sound-label");
 const presetShell = document.querySelector(".preset-shell");
 const soundOptions = document.querySelectorAll("[data-sound]");
+const arpControl = document.querySelector("#arp-pattern");
+const arpButton = document.querySelector("#arp-button");
+const arpLabel = document.querySelector("#arp-label");
+const arpShell = document.querySelector(".arp-shell");
+const arpOptions = document.querySelectorAll("[data-arp]");
+const arpTempoControl = document.querySelector("#arp-tempo");
+const arpTempoValue = document.querySelector("#arp-tempo-value");
+const arpValue = document.querySelector("#arp-value");
 const delayControl = document.querySelector("#delay");
 const reverbControl = document.querySelector("#reverb");
 const octaveControl = document.querySelector("#octave");
@@ -133,6 +142,8 @@ let waveformData;
 let smoothedWaveform;
 let visualizerFrame;
 let visualEnergy = 0;
+let arpTimer;
+let arpStep = 0;
 
 renderKeyboard();
 syncOctave();
@@ -160,6 +171,10 @@ delayControl.addEventListener("input", () => {
 reverbControl.addEventListener("input", () => {
   updateKnobDisplay(reverbControl, reverbValue);
   updateEffects();
+});
+arpTempoControl.addEventListener("input", () => {
+  updateKnobDisplay(arpTempoControl, arpTempoValue, " BPM");
+  restartArpeggiator();
 });
 octaveControl.addEventListener("input", () => {
   setOctaveShift(Number(octaveControl.value));
@@ -231,6 +246,67 @@ document.addEventListener("click", (event) => {
   if (!presetShell.contains(event.target)) {
     closeSoundMenu();
   }
+
+  if (!arpShell.contains(event.target)) {
+    closeArpMenu();
+  }
+});
+
+arpButton.addEventListener("click", () => {
+  toggleArpMenu();
+});
+
+arpButton.addEventListener("keydown", (event) => {
+  if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+    event.preventDefault();
+    openArpMenu();
+    focusArpOption(arpControl.value);
+  }
+});
+
+arpOptions.forEach((option) => {
+  option.addEventListener("click", () => {
+    setArpPattern(option.dataset.arp);
+    closeArpMenu();
+    arpButton.focus();
+  });
+
+  option.addEventListener("keydown", (event) => {
+    const currentIndex = [...arpOptions].indexOf(option);
+
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      arpOptions[(currentIndex + 1) % arpOptions.length].focus();
+    }
+
+    if (event.key === "ArrowUp") {
+      event.preventDefault();
+      arpOptions[(currentIndex - 1 + arpOptions.length) % arpOptions.length].focus();
+    }
+
+    if (event.key === "Home") {
+      event.preventDefault();
+      arpOptions[0].focus();
+    }
+
+    if (event.key === "End") {
+      event.preventDefault();
+      arpOptions[arpOptions.length - 1].focus();
+    }
+
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      setArpPattern(option.dataset.arp);
+      closeArpMenu();
+      arpButton.focus();
+    }
+
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closeArpMenu();
+      arpButton.focus();
+    }
+  });
 });
 
 themeToggle.addEventListener("click", () => {
@@ -241,7 +317,7 @@ themeToggle.addEventListener("click", () => {
 });
 
 window.addEventListener("keydown", (event) => {
-  if (event.target.closest(".preset-shell")) return;
+  if (event.target.closest(".preset-shell") || event.target.closest(".arp-shell")) return;
 
   if (event.code === "Space") {
     event.preventDefault();
@@ -266,7 +342,7 @@ window.addEventListener("keydown", (event) => {
 
   if (event.repeat) return;
   const key = keysByKeyboard.get(event.key.toLowerCase());
-  if (key) startNote(key.dataset.note);
+  if (key) pressNote(key.dataset.note);
 });
 
 window.addEventListener("keyup", (event) => {
@@ -278,7 +354,7 @@ window.addEventListener("keyup", (event) => {
   }
 
   const key = keysByKeyboard.get(event.key.toLowerCase());
-  if (key) stopNote(key.dataset.note);
+  if (key) releaseNote(key.dataset.note);
 });
 
 function getAudio() {
@@ -318,9 +394,7 @@ function getAudio() {
 
 window.addEventListener("resize", resizeWaveform);
 
-function startNote(note) {
-  if (activeNotes.has(note)) return;
-
+function createVoice(note, level = 0.8) {
   const context = getAudio();
   const preset = soundPresets[soundControl.value] ?? soundPresets.classic;
   const filter = context.createBiquadFilter();
@@ -343,7 +417,7 @@ function startNote(note) {
   filter.frequency.value = preset.filter;
   filter.Q.value = 0.7;
   gain.gain.setValueAtTime(0.0001, context.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.8, context.currentTime + preset.attack);
+  gain.gain.exponentialRampToValueAtTime(level, context.currentTime + preset.attack);
 
   filter.connect(gain);
   gain.connect(dryGain);
@@ -351,8 +425,48 @@ function startNote(note) {
   gain.connect(reverbSend);
   oscillators.forEach((oscillator) => oscillator.start());
 
-  activeNotes.set(note, { oscillators, gain, release: preset.release });
+  return { context, oscillators, gain, release: preset.release };
+}
+
+function startNote(note) {
+  if (activeNotes.has(note)) return;
+
+  const { oscillators, gain, release } = createVoice(note);
+  activeNotes.set(note, { oscillators, gain, release });
   keysByNote.get(note)?.classList.add("active");
+}
+
+function pressNote(note) {
+  if (!isArpeggiatorOn()) {
+    startNote(note);
+    return;
+  }
+
+  heldArpNotes.add(note);
+  keysByNote.get(note)?.classList.add("active");
+  restartArpeggiator();
+}
+
+function releaseNote(note) {
+  if (!isArpeggiatorOn()) {
+    stopNote(note);
+    return;
+  }
+
+  heldArpNotes.delete(note);
+  keysByNote.get(note)?.classList.remove("active");
+  restartArpeggiator();
+}
+
+function triggerArpNote(note) {
+  const { context, oscillators, gain, release } = createVoice(note, 0.62);
+  const key = keysByNote.get(note);
+  const duration = getArpInterval() * 0.72;
+
+  key?.classList.add("arp-pulse");
+  gain.gain.setTargetAtTime(0.0001, context.currentTime + duration / 1000, 0.045);
+  oscillators.forEach((oscillator) => oscillator.stop(context.currentTime + duration / 1000 + release));
+  window.setTimeout(() => key?.classList.remove("arp-pulse"), Math.max(90, duration));
 }
 
 function setOctaveShift(nextShift) {
@@ -360,6 +474,7 @@ function setOctaveShift(nextShift) {
   if (octaveShift === clampedShift) return;
 
   activeNotes.forEach((_, note) => stopNote(note, true));
+  clearHeldArpNotes();
   octaveShift = clampedShift;
   octaveControl.value = String(octaveShift);
   syncOctave();
@@ -403,9 +518,9 @@ function renderKeyboard() {
       ${pianoKey.shortcut ? `<span class="shortcut">${pianoKey.shortcut.toUpperCase()}</span>` : ""}
     `;
 
-    key.addEventListener("pointerdown", () => startNote(key.dataset.note));
-    key.addEventListener("pointerup", () => stopNote(key.dataset.note));
-    key.addEventListener("pointerleave", () => stopNote(key.dataset.note));
+    key.addEventListener("pointerdown", () => pressNote(key.dataset.note));
+    key.addEventListener("pointerup", () => releaseNote(key.dataset.note));
+    key.addEventListener("pointerleave", () => releaseNote(key.dataset.note));
 
     keysByNote.set(pianoKey.note, key);
 
@@ -458,6 +573,7 @@ function syncControlDisplays() {
   updateFaderDisplay(volumeControl, volumeValue);
   updateKnobDisplay(delayControl, delayValue);
   updateKnobDisplay(reverbControl, reverbValue);
+  updateKnobDisplay(arpTempoControl, arpTempoValue, " BPM");
 }
 
 function updateFaderDisplay(control, output) {
@@ -466,14 +582,15 @@ function updateFaderDisplay(control, output) {
   output.textContent = `${Math.round(progress * 100)}%`;
 }
 
-function updateKnobDisplay(control, output) {
+function updateKnobDisplay(control, output, suffix = "%") {
   const progress = getControlProgress(control);
   const rotation = -135 + progress * 270;
-  const knob = control.closest(".knob-control");
+  const knob = control.closest(".knob-control, .tempo-control");
 
   knob.style.setProperty("--rotation", `${rotation}deg`);
   knob.style.setProperty("--knob-fill", `${progress * 75}%`);
-  output.textContent = `${Math.round(progress * 100)}%`;
+  output.textContent =
+    suffix === "%" ? `${Math.round(progress * 100)}%` : `${Math.round(Number(control.value))}${suffix}`;
 }
 
 function getControlProgress(control) {
@@ -515,6 +632,129 @@ function closeSoundMenu() {
 function focusSoundOption(sound) {
   const selectedOption = [...soundOptions].find((option) => option.dataset.sound === sound);
   selectedOption?.focus();
+}
+
+function setArpPattern(nextPattern) {
+  const selectedOption = [...arpOptions].find((option) => option.dataset.arp === nextPattern);
+  if (!selectedOption) return;
+
+  const wasOn = isArpeggiatorOn();
+  activeNotes.forEach((_, note) => stopNote(note, true));
+  arpControl.value = nextPattern;
+  arpLabel.textContent = selectedOption.querySelector("span:last-child").textContent;
+  arpValue.textContent = nextPattern === "off" ? "Off" : `${arpTempoControl.value} BPM`;
+  arpOptions.forEach((option) => {
+    option.setAttribute("aria-selected", String(option === selectedOption));
+  });
+
+  if (!isArpeggiatorOn()) {
+    clearHeldArpNotes();
+    stopArpeggiator();
+    return;
+  }
+
+  if (!wasOn) {
+    clearHeldArpNotes();
+  }
+
+  restartArpeggiator();
+}
+
+function toggleArpMenu() {
+  if (arpShell.dataset.open === "true") {
+    closeArpMenu();
+  } else {
+    openArpMenu();
+  }
+}
+
+function openArpMenu() {
+  arpShell.dataset.open = "true";
+  arpButton.setAttribute("aria-expanded", "true");
+}
+
+function closeArpMenu() {
+  arpShell.dataset.open = "false";
+  arpButton.setAttribute("aria-expanded", "false");
+}
+
+function focusArpOption(pattern) {
+  const selectedOption = [...arpOptions].find((option) => option.dataset.arp === pattern);
+  selectedOption?.focus();
+}
+
+function isArpeggiatorOn() {
+  return arpControl.value !== "off";
+}
+
+function restartArpeggiator() {
+  if (isArpeggiatorOn()) {
+    arpValue.textContent = `${arpTempoControl.value} BPM`;
+  }
+
+  stopArpeggiator();
+
+  if (!isArpeggiatorOn() || heldArpNotes.size === 0) return;
+
+  playArpStep();
+  arpTimer = window.setInterval(playArpStep, getArpInterval());
+}
+
+function stopArpeggiator() {
+  if (arpTimer) {
+    window.clearInterval(arpTimer);
+    arpTimer = undefined;
+  }
+}
+
+function playArpStep() {
+  const notes = getHeldArpNotes();
+  if (notes.length === 0) {
+    stopArpeggiator();
+    return;
+  }
+
+  const pattern = arpControl.value;
+  if (pattern === "chord") {
+    notes.forEach(triggerArpNote);
+    arpStep += 1;
+    return;
+  }
+
+  const sequence = getArpSequence(notes, pattern);
+  const note = sequence[arpStep % sequence.length];
+  arpStep += 1;
+  triggerArpNote(note);
+}
+
+function getHeldArpNotes() {
+  return [...heldArpNotes].sort((first, second) => getFrequency(first) - getFrequency(second));
+}
+
+function getArpSequence(notes, pattern) {
+  if (pattern === "down") return [...notes].reverse();
+
+  if (pattern === "up-down") {
+    const down = notes.length > 2 ? notes.slice(1, -1).reverse() : [];
+    return [...notes, ...down];
+  }
+
+  if (pattern === "random") {
+    return [notes[Math.floor(Math.random() * notes.length)]];
+  }
+
+  return notes;
+}
+
+function getArpInterval() {
+  return (60000 / Number(arpTempoControl.value)) / 2;
+}
+
+function clearHeldArpNotes() {
+  heldArpNotes.clear();
+  document.querySelectorAll(".key.active, .key.arp-pulse").forEach((key) => {
+    key.classList.remove("active", "arp-pulse");
+  });
 }
 
 function syncSustain() {

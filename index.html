@@ -40,7 +40,7 @@
         : "light";
       document.documentElement.dataset.theme = savedTheme || preferredTheme;
     </script>
-    <link rel="stylesheet" href="styles.css?v=26" />
+    <link rel="stylesheet" href="styles.css?v=27" />
   </head>
   <body>
     <main class="app" aria-label="Simple piano web app">
@@ -144,6 +144,69 @@
               </span>
             </span>
           </div>
+          <div class="arp-control control-block">
+            <span class="control-heading">
+              <span class="control-title">
+                <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+                  <path d="M4 17h3l3-10 4 10 3-10 3 10" />
+                  <path d="M4 7h2" />
+                  <path d="M18 7h2" />
+                </svg>
+                Arp
+              </span>
+            </span>
+            <span class="arp-shell">
+              <input id="arp-pattern" type="hidden" value="off" />
+              <button
+                id="arp-button"
+                class="arp-button"
+                type="button"
+                aria-haspopup="listbox"
+                aria-expanded="false"
+                aria-controls="arp-menu"
+              >
+                <span class="pattern-icon" aria-hidden="true">Off</span>
+                <span id="arp-label">Off</span>
+              </button>
+              <span id="arp-menu" class="arp-menu" role="listbox" aria-label="Arpeggiator pattern">
+                <span class="tempo-panel">
+                  <span class="tempo-copy">Tempo</span>
+                  <span class="tempo-control">
+                    <input id="arp-tempo" class="knob-input" type="range" min="60" max="180" step="1" value="120" />
+                    <span class="knob-shell tempo-knob" aria-hidden="true">
+                      <span class="knob-dial"></span>
+                    </span>
+                  </span>
+                  <output id="arp-tempo-value" for="arp-tempo">120 BPM</output>
+                </span>
+                <button type="button" role="option" data-arp="off" aria-selected="true">
+                  <span class="pattern-icon" aria-hidden="true">Off</span>
+                  <span>Off</span>
+                </button>
+                <button type="button" role="option" data-arp="up" aria-selected="false">
+                  <span class="pattern-icon" aria-hidden="true">Up</span>
+                  <span>Up</span>
+                </button>
+                <button type="button" role="option" data-arp="down" aria-selected="false">
+                  <span class="pattern-icon" aria-hidden="true">Dn</span>
+                  <span>Down</span>
+                </button>
+                <button type="button" role="option" data-arp="up-down" aria-selected="false">
+                  <span class="pattern-icon" aria-hidden="true">UD</span>
+                  <span>Up Down</span>
+                </button>
+                <button type="button" role="option" data-arp="random" aria-selected="false">
+                  <span class="pattern-icon" aria-hidden="true">Rnd</span>
+                  <span>Random</span>
+                </button>
+                <button type="button" role="option" data-arp="chord" aria-selected="false">
+                  <span class="pattern-icon" aria-hidden="true">All</span>
+                  <span>Chord Pulse</span>
+                </button>
+              </span>
+            </span>
+            <output id="arp-value" for="arp-pattern">Off</output>
+          </div>
           <label class="effect-control">
             <span class="control-heading">
               <span class="control-title">
@@ -227,6 +290,6 @@
         <footer class="credit">Built by Elham Aboutorabi</footer>
       </section>
     </main>
-    <script src="app.js?v=26"></script>
+    <script src="app.js?v=27"></script>
   </body>
 </html>
