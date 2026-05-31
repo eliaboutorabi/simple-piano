@@ -544,10 +544,16 @@ h1 {
   height: 22px;
   border: 1px solid color-mix(in srgb, currentColor 28%, transparent);
   border-radius: 6px;
-  font-size: 0.58rem;
-  font-weight: 900;
-  line-height: 1;
-  text-transform: uppercase;
+}
+
+.pattern-icon svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .tempo-panel {
@@ -597,6 +603,44 @@ h1 {
 
 #arp-tempo-value {
   text-align: left;
+}
+
+.latch-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 36px;
+  margin-bottom: 4px;
+  border: 1px solid color-mix(in srgb, var(--line) 82%, var(--accent) 18%);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--panel-soft) 84%, transparent);
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.74rem;
+  font-weight: 850;
+}
+
+.latch-button svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.latch-button:hover,
+.latch-button:focus-visible {
+  color: var(--accent-strong);
+  outline: 0;
+}
+
+.latch-button[aria-pressed="true"] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: white;
 }
 
 .effect-control {

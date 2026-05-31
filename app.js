@@ -95,6 +95,7 @@ const soundPresets = {
 
 const activeNotes = new Map();
 const heldArpNotes = new Set();
+const pressedArpNotes = new Set();
 const keysByNote = new Map();
 const keysByKeyboard = new Map();
 const volumeControl = document.querySelector("#volume");
@@ -110,6 +111,7 @@ const arpShell = document.querySelector(".arp-shell");
 const arpOptions = document.querySelectorAll("[data-arp]");
 const arpTempoControl = document.querySelector("#arp-tempo");
 const arpTempoValue = document.querySelector("#arp-tempo-value");
+const arpLatchButton = document.querySelector("#arp-latch");
 const arpValue = document.querySelector("#arp-value");
 const delayControl = document.querySelector("#delay");
 const reverbControl = document.querySelector("#reverb");
@@ -144,6 +146,7 @@ let visualizerFrame;
 let visualEnergy = 0;
 let arpTimer;
 let arpStep = 0;
+let arpLatch = false;
 
 renderKeyboard();
 syncOctave();
@@ -175,6 +178,9 @@ reverbControl.addEventListener("input", () => {
 arpTempoControl.addEventListener("input", () => {
   updateKnobDisplay(arpTempoControl, arpTempoValue, " BPM");
   restartArpeggiator();
+});
+arpLatchButton.addEventListener("click", () => {
+  toggleArpLatch();
 });
 octaveControl.addEventListener("input", () => {
   setOctaveShift(Number(octaveControl.value));
@@ -442,6 +448,14 @@ function pressNote(note) {
     return;
   }
 
+  if (arpLatch && heldArpNotes.has(note) && !pressedArpNotes.has(note)) {
+    heldArpNotes.delete(note);
+    keysByNote.get(note)?.classList.remove("active");
+    restartArpeggiator();
+    return;
+  }
+
+  pressedArpNotes.add(note);
   heldArpNotes.add(note);
   keysByNote.get(note)?.classList.add("active");
   restartArpeggiator();
@@ -453,9 +467,13 @@ function releaseNote(note) {
     return;
   }
 
-  heldArpNotes.delete(note);
-  keysByNote.get(note)?.classList.remove("active");
-  restartArpeggiator();
+  pressedArpNotes.delete(note);
+
+  if (!arpLatch) {
+    heldArpNotes.delete(note);
+    keysByNote.get(note)?.classList.remove("active");
+    restartArpeggiator();
+  }
 }
 
 function triggerArpNote(note) {
@@ -641,9 +659,9 @@ function setArpPattern(nextPattern) {
   const wasOn = isArpeggiatorOn();
   activeNotes.forEach((_, note) => stopNote(note, true));
   arpControl.value = nextPattern;
-  arpButton.querySelector(".pattern-icon").textContent =
-    selectedOption.querySelector(".pattern-icon").textContent;
-  arpLabel.textContent = selectedOption.querySelector("span:last-child").textContent;
+  arpButton.querySelector(".pattern-icon").innerHTML =
+    selectedOption.querySelector(".pattern-icon").innerHTML;
+  arpLabel.textContent = selectedOption.querySelector(".pattern-label").textContent;
   arpValue.textContent = nextPattern === "off" ? "Off" : `${arpTempoControl.value} BPM`;
   arpOptions.forEach((option) => {
     option.setAttribute("aria-selected", String(option === selectedOption));
@@ -683,6 +701,21 @@ function closeArpMenu() {
 function focusArpOption(pattern) {
   const selectedOption = [...arpOptions].find((option) => option.dataset.arp === pattern);
   selectedOption?.focus();
+}
+
+function toggleArpLatch() {
+  arpLatch = !arpLatch;
+  arpLatchButton.setAttribute("aria-pressed", String(arpLatch));
+
+  if (!arpLatch) {
+    heldArpNotes.forEach((note) => {
+      if (!pressedArpNotes.has(note)) {
+        heldArpNotes.delete(note);
+        keysByNote.get(note)?.classList.remove("active");
+      }
+    });
+    restartArpeggiator();
+  }
 }
 
 function isArpeggiatorOn() {
@@ -754,6 +787,7 @@ function getArpInterval() {
 
 function clearHeldArpNotes() {
   heldArpNotes.clear();
+  pressedArpNotes.clear();
   document.querySelectorAll(".key.active, .key.arp-pulse").forEach((key) => {
     key.classList.remove("active", "arp-pulse");
   });

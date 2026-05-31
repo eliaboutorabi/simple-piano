@@ -40,7 +40,7 @@
         : "light";
       document.documentElement.dataset.theme = savedTheme || preferredTheme;
     </script>
-    <link rel="stylesheet" href="styles.css?v=28" />
+    <link rel="stylesheet" href="styles.css?v=29" />
   </head>
   <body>
     <main class="app" aria-label="Simple piano web app">
@@ -165,7 +165,12 @@
                 aria-expanded="false"
                 aria-controls="arp-menu"
               >
-                <span class="pattern-icon" aria-hidden="true">Off</span>
+                <span id="arp-icon" class="pattern-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" focusable="false">
+                    <circle cx="12" cy="12" r="8" />
+                    <path d="m5 5 14 14" />
+                  </svg>
+                </span>
                 <span id="arp-label">Off</span>
               </button>
               <span id="arp-menu" class="arp-menu" role="listbox" aria-label="Arpeggiator pattern">
@@ -179,29 +184,72 @@
                   </span>
                   <output id="arp-tempo-value" for="arp-tempo">120 BPM</output>
                 </span>
+                <button id="arp-latch" class="latch-button" type="button" aria-pressed="false">
+                  <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+                    <rect x="6" y="10" width="12" height="10" rx="2" />
+                    <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+                  </svg>
+                  <span>Latch</span>
+                </button>
                 <button type="button" role="option" data-arp="off" aria-selected="true">
-                  <span class="pattern-icon" aria-hidden="true">Off</span>
-                  <span>Off</span>
+                  <span class="pattern-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false">
+                      <circle cx="12" cy="12" r="8" />
+                      <path d="m5 5 14 14" />
+                    </svg>
+                  </span>
+                  <span class="pattern-label">Off</span>
                 </button>
                 <button type="button" role="option" data-arp="up" aria-selected="false">
-                  <span class="pattern-icon" aria-hidden="true">Up</span>
-                  <span>Up</span>
+                  <span class="pattern-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false">
+                      <path d="M12 19V5" />
+                      <path d="m5 12 7-7 7 7" />
+                    </svg>
+                  </span>
+                  <span class="pattern-label">Up</span>
                 </button>
                 <button type="button" role="option" data-arp="down" aria-selected="false">
-                  <span class="pattern-icon" aria-hidden="true">Dn</span>
-                  <span>Down</span>
+                  <span class="pattern-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false">
+                      <path d="M12 5v14" />
+                      <path d="m19 12-7 7-7-7" />
+                    </svg>
+                  </span>
+                  <span class="pattern-label">Down</span>
                 </button>
                 <button type="button" role="option" data-arp="up-down" aria-selected="false">
-                  <span class="pattern-icon" aria-hidden="true">UD</span>
-                  <span>Up Down</span>
+                  <span class="pattern-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false">
+                      <path d="M8 7h10" />
+                      <path d="m15 4 3 3-3 3" />
+                      <path d="M16 17H6" />
+                      <path d="m9 20-3-3 3-3" />
+                    </svg>
+                  </span>
+                  <span class="pattern-label">Up Down</span>
                 </button>
                 <button type="button" role="option" data-arp="random" aria-selected="false">
-                  <span class="pattern-icon" aria-hidden="true">Rnd</span>
-                  <span>Random</span>
+                  <span class="pattern-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false">
+                      <path d="M16 3h5v5" />
+                      <path d="M4 20 21 3" />
+                      <path d="M21 16v5h-5" />
+                      <path d="M15 15l6 6" />
+                      <path d="M4 4l5 5" />
+                    </svg>
+                  </span>
+                  <span class="pattern-label">Random</span>
                 </button>
                 <button type="button" role="option" data-arp="chord" aria-selected="false">
-                  <span class="pattern-icon" aria-hidden="true">All</span>
-                  <span>Chord Pulse</span>
+                  <span class="pattern-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false">
+                      <path d="M4 7h16" />
+                      <path d="M4 12h16" />
+                      <path d="M4 17h16" />
+                    </svg>
+                  </span>
+                  <span class="pattern-label">Chord Pulse</span>
                 </button>
               </span>
             </span>
@@ -290,6 +338,6 @@
         <footer class="credit">Built by Elham Aboutorabi</footer>
       </section>
     </main>
-    <script src="app.js?v=28"></script>
+    <script src="app.js?v=29"></script>
   </body>
 </html>
