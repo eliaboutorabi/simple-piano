@@ -460,7 +460,7 @@ h1 {
   height: 72px;
   align-items: center;
   justify-self: center;
-  width: min(148px, 100%);
+  width: min(158px, 100%);
 }
 
 .preset-menu,

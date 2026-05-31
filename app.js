@@ -641,6 +641,8 @@ function setArpPattern(nextPattern) {
   const wasOn = isArpeggiatorOn();
   activeNotes.forEach((_, note) => stopNote(note, true));
   arpControl.value = nextPattern;
+  arpButton.querySelector(".pattern-icon").textContent =
+    selectedOption.querySelector(".pattern-icon").textContent;
   arpLabel.textContent = selectedOption.querySelector("span:last-child").textContent;
   arpValue.textContent = nextPattern === "off" ? "Off" : `${arpTempoControl.value} BPM`;
   arpOptions.forEach((option) => {
